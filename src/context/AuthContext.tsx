@@ -8,9 +8,9 @@ import {
     useEffect,
     useCallback,
 } from "react";
-import { api } from "../lib/api";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+import AuthService from "@/services/auth.service";
+import { FullScreenLoader } from "@/components/FullScreenLoader";
 
 interface User {
     id: string;
@@ -21,8 +21,7 @@ interface User {
 
 interface AuthContextType {
     user: User | null;
-    token: string | null;
-    login: (credentials: any) => Promise<void>;
+    login: (credentials: any) => Promise<User>;
     logout: () => void;
     isLoading: boolean;
 }
@@ -31,67 +30,49 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
-    const [token, setToken] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const router = useRouter();
 
-    const logout = useCallback(() => {
-        setUser(null);
-        setToken(null);
-        localStorage.removeItem("authToken");
-        delete api.defaults.headers.common["Authorization"];
-        router.push("/login");
+    const logout = useCallback(async () => {
+        try {
+            await AuthService.logout();
+        } catch (error) {
+            console.error("Logout failed on server:", error);
+        } finally {
+            setUser(null);
+            router.push("/login");
+        }
     }, [router]);
 
     useEffect(() => {
         const initializeAuth = async () => {
-            const storedToken = localStorage.getItem("authToken");
-            if (storedToken) {
-                setToken(storedToken);
-                api.defaults.headers.common[
-                    "Authorization"
-                ] = `Bearer ${storedToken}`;
-                try {
-                    const response = await api.get("/auth/me");
-                    setUser(response.data.data);
-                } catch (error) {
-                    logout();
-                }
+            try {
+                const userData = await AuthService.getMe();
+                setUser(userData);
+            } catch (error) {
+                setUser(null);
             }
             setIsLoading(false);
         };
 
         initializeAuth();
-    }, [logout]);
+    }, []);
 
     const login = async (credentials: any) => {
         try {
-            const response = await api.post("/auth/login", credentials);
-            const { tokenData, user } = response.data.data;
-
-            setToken(tokenData.token);
-            setUser(user);
-
-            localStorage.setItem("authToken", tokenData.token);
-            api.defaults.headers.common[
-                "Authorization"
-            ] = `Bearer ${tokenData.token}`;
-
-            if (user.role === "ADMIN") {
-                toast.success("Login Success");
-            } else {
-                router.push("/login");
-            }
+            const loggedInUser = await AuthService.login(credentials);
+            setUser(loggedInUser);
+            return loggedInUser;
         } catch (error) {
-            toast.error(
-                error instanceof Error ? error.message : "Login failed"
-            );
+            throw error;
         }
     };
 
+    const value = { user, login, logout, isLoading };
+
     return (
-        <AuthContext.Provider value={{ user, token, login, logout, isLoading }}>
-            {!isLoading && children}
+        <AuthContext.Provider value={value}>
+            {isLoading ? <FullScreenLoader /> : children}
         </AuthContext.Provider>
     );
 };

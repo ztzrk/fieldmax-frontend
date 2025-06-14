@@ -1,27 +1,18 @@
 "use client";
-import { useAuth } from "@/context/AuthContext";
-import { useRouter } from "next/navigation";
-import React, { useEffect } from "react";
 
-function AdminLayout({ children }: { children: React.ReactNode }) {
-    const { user, token, isLoading } = useAuth();
-    const router = useRouter();
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { ReactNode } from "react";
+import { AdminSidebar } from "./components/sidebar";
+import { Header } from "./components/header";
 
-    useEffect(() => {
-        if (isLoading) {
-            return;
-        }
-
-        if (!user || !token) {
-            router.push("/login");
-            return;
-        }
-
-        if (user.role !== "ADMIN") {
-            router.push("/");
-        }
-    }, [user, token, isLoading, router]);
-    return <>{isLoading && { children }}</>;
+export default function AdminLayout({ children }: { children: ReactNode }) {
+    return (
+        <SidebarProvider>
+            <AdminSidebar />
+            <div className="flex flex-1 flex-col sm:border-l">
+                <Header />
+                <main className="flex-1 p-4 pt-6 md:p-8">{children}</main>
+            </div>
+        </SidebarProvider>
+    );
 }
-
-export default AdminLayout;

@@ -1,0 +1,53 @@
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import UserService from "@/services/user.service";
+import { toast } from "sonner";
+
+export function useGetAllUsers() {
+    return useQuery({
+        queryKey: ["users"],
+        queryFn: UserService.getAllUsers,
+    });
+}
+
+export function useCreateUser() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (userData: any) => UserService.createUser(userData),
+        onSuccess: () => {
+            toast.success("User created successfully!");
+            queryClient.invalidateQueries({ queryKey: ["users"] });
+        },
+        onError: () => {
+            toast.error("Failed to create user.");
+        },
+    });
+}
+
+export function useUpdateUser() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ userId, userData }: { userId: string; userData: any }) =>
+            UserService.updateUser(userId, userData),
+        onSuccess: () => {
+            toast.success("User updated successfully!");
+            queryClient.invalidateQueries({ queryKey: ["users"] });
+        },
+        onError: () => {
+            toast.error("Failed to update user.");
+        },
+    });
+}
+
+export function useDeleteUser() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: UserService.deleteUser,
+        onSuccess: () => {
+            toast.success("User deleted successfully.");
+            queryClient.invalidateQueries({ queryKey: ["users"] });
+        },
+        onError: () => {
+            toast.error("Failed to delete user.");
+        },
+    });
+}

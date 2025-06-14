@@ -27,7 +27,6 @@ export default function AdminDashboard() {
                     <span className="font-semibold">{user?.role}</span>
                 </p>
             </div>
-            {/* Di sini Anda akan menambahkan komponen lain seperti tabel data, statistik, dll. */}
         </div>
     );
 }
