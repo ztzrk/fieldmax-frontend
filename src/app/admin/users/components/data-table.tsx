@@ -34,6 +34,7 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import ConfirmationDialog from "@/components/shared/ConfirmationDialog";
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
@@ -82,33 +83,17 @@ export function DataTable<TData, TValue>({
         <div>
             <div className="flex items-center py-4">
                 {Object.keys(rowSelection).length > 0 && (
-                    <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                            <Button variant="destructive" className="ml-4">
+                    <ConfirmationDialog
+                        Trigger={
+                            <Button variant="destructive" className="mr-2">
                                 Delete Selected
                             </Button>
-                        </AlertDialogTrigger>
-
-                        <AlertDialogContent>
-                            <AlertDialogHeader>
-                                <AlertDialogTitle>
-                                    Are you absolutely sure?
-                                </AlertDialogTitle>
-                                <AlertDialogDescription>
-                                    This action cannot be undone. This will
-                                    permanently delete the user account.
-                                </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction
-                                    onClick={handleDeleteSelected}
-                                >
-                                    Continue
-                                </AlertDialogAction>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
-                    </AlertDialog>
+                        }
+                        Title="Delete Confirmation"
+                        Description="Are you sure you want to delete the selected users?"
+                        onConfirm={handleDeleteSelected}
+                        Action="Delete"
+                    />
                 )}
             </div>
             <div className="rounded-md border">
