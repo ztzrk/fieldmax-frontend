@@ -16,6 +16,8 @@ interface User {
     id: string;
     fullName: string;
     email: string;
+    profilePictureUrl?: string;
+    phoneNumber?: string;
     role: "USER" | "RENTER" | "ADMIN";
 }
 
