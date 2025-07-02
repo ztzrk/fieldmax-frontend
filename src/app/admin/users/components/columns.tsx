@@ -57,7 +57,6 @@ const ActionsCell = ({ user }: { user: User }) => {
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="h-8 w-8 p-0">
-                        <span className="sr-only">Open menu</span>
                         <MoreHorizontal className="h-4 w-4" />
                     </Button>
                 </DropdownMenuTrigger>
@@ -73,7 +72,7 @@ const ActionsCell = ({ user }: { user: User }) => {
                         <DropdownMenuItem>Edit User</DropdownMenuItem>
                     </DialogTrigger>
                     <ConfirmationDialog
-                        Trigger={
+                        trigger={
                             <DropdownMenuItem
                                 className="text-red-500"
                                 onSelect={(e) => e.preventDefault()}
@@ -81,9 +80,9 @@ const ActionsCell = ({ user }: { user: User }) => {
                                 Delete User
                             </DropdownMenuItem>
                         }
-                        Title="Are you absolutely sure?"
-                        Description="This action cannot be undone. This will permanently delete the user account."
-                        Action="Continue"
+                        title="Are you absolutely sure?"
+                        description="This action cannot be undone. This will permanently delete the user account."
+                        action="Continue"
                         onConfirm={handleDelete}
                     />
                 </DropdownMenuContent>
