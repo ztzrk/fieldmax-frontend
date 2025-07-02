@@ -1,4 +1,10 @@
-import { Building, FileText, LayoutDashboard, Users } from "lucide-react";
+import {
+    Building,
+    FileText,
+    LayoutDashboard,
+    Swords,
+    Users,
+} from "lucide-react";
 
 import {
     Sidebar,
@@ -10,6 +16,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { usePathname } from "next/navigation";
 
 // Menu items.
 const items = [
@@ -24,6 +31,11 @@ const items = [
         icon: Users,
     },
     {
+        title: "Sport Types",
+        url: "/admin/sport-types",
+        icon: Swords,
+    },
+    {
         title: "Venues",
         url: "/admin/venues",
         icon: Building,
@@ -36,6 +48,7 @@ const items = [
 ];
 
 export function AdminSidebar() {
+    const pathname = usePathname();
     return (
         <Sidebar>
             <SidebarContent>
@@ -47,12 +60,7 @@ export function AdminSidebar() {
                                 <SidebarMenuItem key={item.title}>
                                     <SidebarMenuButton
                                         asChild
-                                        isActive={
-                                            item.url.split("/")[2] ===
-                                            window.location.pathname.split(
-                                                "/"
-                                            )[2]
-                                        }
+                                        isActive={pathname === item.url}
                                     >
                                         <a href={item.url}>
                                             <item.icon />
