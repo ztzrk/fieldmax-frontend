@@ -13,23 +13,23 @@ import {
 import { Button } from "../ui/button";
 
 function ConfirmationDialog({
-    Trigger,
-    Title,
-    Description,
-    Action,
+    trigger,
+    title,
+    description,
+    action,
     onConfirm,
 }: {
-    Trigger: React.ReactNode;
-    Title: string;
-    Description: string;
-    Action: string;
+    trigger: React.ReactNode;
+    title: string;
+    description: string;
+    action: string;
     onConfirm: () => void;
 }) {
     return (
         <AlertDialog>
             <AlertDialogTrigger asChild>
-                {Trigger ? (
-                    Trigger
+                {trigger ? (
+                    trigger
                 ) : (
                     <Button variant="destructive">Delete</Button>
                 )}
@@ -37,15 +37,15 @@ function ConfirmationDialog({
 
             <AlertDialogContent>
                 <AlertDialogHeader>
-                    <AlertDialogTitle>{Title}</AlertDialogTitle>
+                    <AlertDialogTitle>{title}</AlertDialogTitle>
                     <AlertDialogDescription>
-                        {Description}
+                        {description}
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
                     <AlertDialogAction onClick={onConfirm}>
-                        {Action}
+                        {action}
                     </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
