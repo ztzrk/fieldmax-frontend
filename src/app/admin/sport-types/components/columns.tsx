@@ -23,6 +23,7 @@ import { SportTypeForm } from "./SportTypeForm";
 import { useUpdateSportType, useDeleteSportType } from "@/hooks/useSportTypes";
 import ConfirmationDialog from "@/components/shared/ConfirmationDialog";
 import { Checkbox } from "@radix-ui/react-checkbox";
+import { toast } from "sonner";
 
 export type SportType = {
     id: string;
@@ -31,27 +32,33 @@ export type SportType = {
 };
 
 const ActionsCell = ({ sportType }: { sportType: SportType }) => {
-    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
     const { mutate: deleteSportType } = useDeleteSportType();
-    const { mutate: updateSportType } = useUpdateSportType();
+    const { mutate: updateSportType, isPending } = useUpdateSportType();
 
     const handleDelete = async () => {
         deleteSportType(sportType.id);
     };
 
-    const hanfleEditSubmit = async (data: any) => {
+    const handleEditSubmit = async (data: any) => {
         updateSportType(
             { id: sportType.id, data },
             {
                 onSuccess: () => {
-                    setIsEditDialogOpen(false);
+                    toast.success(`${sportType.name} updated successfully`);
+                    setIsOpen(false);
+                },
+                onError: (error) => {
+                    toast.error(
+                        `Failed to update ${sportType.name} error: ${error.message}`
+                    );
                 },
             }
         );
     };
 
     return (
-        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="h-8 w-8 p-0">
@@ -93,7 +100,8 @@ const ActionsCell = ({ sportType }: { sportType: SportType }) => {
                 </DialogHeader>
                 <SportTypeForm
                     initialData={sportType}
-                    onSubmit={hanfleEditSubmit}
+                    onSubmit={handleEditSubmit}
+                    isPending={isPending}
                 />
             </DialogContent>
         </Dialog>
