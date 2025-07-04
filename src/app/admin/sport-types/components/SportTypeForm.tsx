@@ -2,7 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
     Form,
@@ -13,40 +12,32 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import {
+    SportTypeFormValues,
+    sportTypeSchema,
+} from "@/lib/schema/sport-types.schema";
 import { IconCombobox } from "@/components/shared/IconComboBox";
-const formSchema = z.object({
-    name: z.string().min(1, { message: "Name is required." }),
-    iconName: z.string().optional(),
-});
-
-type FormValues = z.infer<typeof formSchema>;
+import { on } from "events";
 
 interface SportTypeFormProps {
-    initialData?: Partial<FormValues>;
-    onSubmit: (values: FormValues) => Promise<void>;
+    initialData?: Partial<SportTypeFormValues>;
+    onSubmit: (values: SportTypeFormValues) => void;
+    isPending: boolean;
 }
 
-export function SportTypeForm({ initialData, onSubmit }: SportTypeFormProps) {
-    const [isSubmitting, setIsSubmitting] = useState(false);
-
-    const form = useForm<FormValues>({
-        resolver: zodResolver(formSchema),
+export function SportTypeForm({
+    initialData,
+    onSubmit,
+    isPending,
+}: SportTypeFormProps) {
+    const form = useForm<SportTypeFormValues>({
+        resolver: zodResolver(sportTypeSchema),
         defaultValues: initialData || { name: "", iconName: "" },
     });
 
-    const handleSubmit = async (values: FormValues) => {
-        setIsSubmitting(true);
-        await onSubmit(values);
-        setIsSubmitting(false);
-    };
-
     return (
         <Form {...form}>
-            <form
-                onSubmit={form.handleSubmit(handleSubmit)}
-                className="space-y-4"
-            >
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                 <FormField
                     control={form.control}
                     name="name"
@@ -76,12 +67,8 @@ export function SportTypeForm({ initialData, onSubmit }: SportTypeFormProps) {
                         </FormItem>
                     )}
                 />
-                <Button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full"
-                >
-                    {isSubmitting ? "Saving..." : "Save"}
+                <Button type="submit" disabled={isPending} className="w-full">
+                    {isPending ? "Saving..." : "Save"}
                 </Button>
             </form>
         </Form>
