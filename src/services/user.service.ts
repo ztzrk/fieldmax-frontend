@@ -1,12 +1,21 @@
 import { api } from "@/lib/api";
+import { usersApiResponseSchema } from "@/lib/schema/user.schema";
 
 const UserService = {
     getAllUsers: async () => {
         try {
             const response = await api.get("/users");
-            return response.data.data;
+
+            const validatedData = usersApiResponseSchema.parse(
+                response.data.data
+            );
+
+            return validatedData;
         } catch (error) {
-            console.error("API Get All Users Error:", error);
+            console.error(
+                "API Get All Users Error or Validation Failed:",
+                error
+            );
             throw error;
         }
     },
