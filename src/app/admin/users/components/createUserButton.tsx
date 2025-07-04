@@ -11,20 +11,24 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { UserForm } from "./userForm";
-import UserService from "@/services/user.service";
 import { toast } from "sonner";
 import { useCreateUser } from "@/hooks/useUsers";
 
 export function CreateUserButton() {
     const [isOpen, setIsOpen] = useState(false);
-    const router = useRouter();
 
     const { mutate: createUser, isPending } = useCreateUser();
 
-    const handleSubmit = async (values: any) => {
-        createUser(values, {
+    const handleSubmit = async (data: any) => {
+        createUser(data, {
             onSuccess: () => {
+                toast.success(`${data.name} created successfully`);
                 setIsOpen(false);
+            },
+            onError: (error) => {
+                toast.error(
+                    `Failed to create ${data.name} error: ${error.message}`
+                );
             },
         });
     };
@@ -38,7 +42,7 @@ export function CreateUserButton() {
                 <DialogHeader>
                     <DialogTitle>Create New User</DialogTitle>
                 </DialogHeader>
-                <UserForm onSubmit={handleSubmit} />
+                <UserForm onSubmit={handleSubmit} isPending={isPending} />
             </DialogContent>
         </Dialog>
     );
