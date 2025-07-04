@@ -2,7 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
     Form,
@@ -21,32 +20,17 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { useState } from "react";
-
-const formSchema = z.object({
-    fullName: z.string().min(1, { message: "Full name is required." }),
-    email: z.string().email({ message: "Invalid email address." }),
-    password: z
-        .string()
-        .min(8, { message: "Password must be at least 8 characters." })
-        .optional()
-        .or(z.literal("")),
-    phoneNumber: z.string().min(1, { message: "Phone number is required." }),
-    role: z.enum(["USER", "RENTER", "ADMIN"]),
-});
-
-type UserFormValues = z.infer<typeof formSchema>;
+import { UserFormValues, userSchema } from "@/lib/schema/user.schema";
 
 interface UserFormProps {
     initialData?: Partial<UserFormValues>;
-    onSubmit: (values: UserFormValues) => Promise<void>;
+    onSubmit: (values: UserFormValues) => void;
+    isPending: boolean;
 }
 
-export function UserForm({ initialData, onSubmit }: UserFormProps) {
-    const [isSubmitting, setIsSubmitting] = useState(false);
-
+export function UserForm({ initialData, onSubmit, isPending }: UserFormProps) {
     const form = useForm<UserFormValues>({
-        resolver: zodResolver(formSchema),
+        resolver: zodResolver(userSchema),
         defaultValues: initialData || {
             fullName: "",
             email: "",
@@ -56,18 +40,9 @@ export function UserForm({ initialData, onSubmit }: UserFormProps) {
         },
     });
 
-    const handleSubmit = async (values: UserFormValues) => {
-        setIsSubmitting(true);
-        await onSubmit(values);
-        setIsSubmitting(false);
-    };
-
     return (
         <Form {...form}>
-            <form
-                onSubmit={form.handleSubmit(handleSubmit)}
-                className="space-y-4"
-            >
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                 <FormField
                     control={form.control}
                     name="fullName"
@@ -89,6 +64,7 @@ export function UserForm({ initialData, onSubmit }: UserFormProps) {
                             <FormLabel>Email</FormLabel>
                             <FormControl>
                                 <Input
+                                    type="email"
                                     placeholder="budi@example.com"
                                     {...field}
                                 />
@@ -104,15 +80,12 @@ export function UserForm({ initialData, onSubmit }: UserFormProps) {
                         <FormItem>
                             <FormLabel>Password</FormLabel>
                             <FormControl>
-                                <Input
-                                    type="password"
-                                    placeholder="••••••••"
-                                    {...field}
-                                />
+                                <Input type="password" {...field} />
                             </FormControl>
                             <FormDescription>
-                                Leave blank if you don't want to change the
-                                password.
+                                {initialData
+                                    ? "Kosongkan jika tidak ingin mengubah password."
+                                    : "Minimal 8 karakter."}
                             </FormDescription>
                             <FormMessage />
                         </FormItem>
@@ -158,12 +131,8 @@ export function UserForm({ initialData, onSubmit }: UserFormProps) {
                         </FormItem>
                     )}
                 />
-                <Button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full"
-                >
-                    {isSubmitting ? "Saving..." : "Save Changes"}
+                <Button type="submit" disabled={isPending} className="w-full">
+                    {isPending ? "Saving..." : "Save Changes"}
                 </Button>
             </form>
         </Form>
