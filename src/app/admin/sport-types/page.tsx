@@ -14,11 +14,26 @@ import {
 import { SportTypeForm } from "./components/SportTypeForm";
 import { useState } from "react";
 import { DataTable } from "../users/components/data-table";
+import { toast } from "sonner";
 
 export default function AdminSportTypesPage() {
     const { data: sportTypes, isLoading, isError } = useGetAllSportTypes();
-    const { mutate: createSportType } = useCreateSportType();
+    const { mutate: createSportType, isPending } = useCreateSportType();
     const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+
+    const handleSubmit = async (data: any) => {
+        createSportType(data, {
+            onSuccess: () => {
+                toast.success(`${data.name} created successfully`);
+                setIsCreateDialogOpen(false);
+            },
+            onError: (error) => {
+                toast.error(
+                    `Failed to create ${data.name} error: ${error.message}`
+                );
+            },
+        });
+    };
 
     if (isLoading) return <FullScreenLoader />;
     if (isError) return <p className="text-red-500">Error loading data.</p>;
@@ -44,12 +59,8 @@ export default function AdminSportTypesPage() {
                             <DialogTitle>Create New Sport Type</DialogTitle>
                         </DialogHeader>
                         <SportTypeForm
-                            onSubmit={async (data) =>
-                                createSportType(data, {
-                                    onSuccess: () =>
-                                        setIsCreateDialogOpen(false),
-                                })
-                            }
+                            onSubmit={handleSubmit}
+                            isPending={isPending}
                         />
                     </DialogContent>
                 </Dialog>
