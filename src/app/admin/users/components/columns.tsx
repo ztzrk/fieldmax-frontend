@@ -23,6 +23,7 @@ import { UserForm } from "./userForm";
 import { useDeleteUser, useUpdateUser } from "@/hooks/useUsers";
 import { Checkbox } from "@/components/ui/checkbox";
 import ConfirmationDialog from "@/components/shared/ConfirmationDialog"; // Pastikan path ini benar
+import { toast } from "sonner";
 
 export type User = {
     id: string;
@@ -33,27 +34,33 @@ export type User = {
 };
 
 const ActionsCell = ({ user }: { user: User }) => {
-    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
     const { mutate: deleteUser } = useDeleteUser();
-    const { mutate: updateUser } = useUpdateUser();
+    const { mutate: updateUser, isPending } = useUpdateUser();
 
     const handleDelete = async () => {
         deleteUser(user.id);
     };
 
-    const handleEditSubmit = async (values: any) => {
+    const handleEditSubmit = async (data: any) => {
         updateUser(
-            { userId: user.id, userData: values },
+            { userId: user.id, userData: data },
             {
                 onSuccess: () => {
-                    setIsEditDialogOpen(false);
+                    toast.success(`${user.fullName} updated successfully`);
+                    setIsOpen(false);
+                },
+                onError: (error) => {
+                    toast.error(
+                        `Failed to update ${user.fullName} error: ${error.message}`
+                    );
                 },
             }
         );
     };
 
     return (
-        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="h-8 w-8 p-0">
@@ -91,7 +98,11 @@ const ActionsCell = ({ user }: { user: User }) => {
                 <DialogHeader>
                     <DialogTitle>Edit User</DialogTitle>
                 </DialogHeader>
-                <UserForm initialData={user} onSubmit={handleEditSubmit} />
+                <UserForm
+                    initialData={user}
+                    onSubmit={handleEditSubmit}
+                    isPending={isPending}
+                />
             </DialogContent>
         </Dialog>
     );
