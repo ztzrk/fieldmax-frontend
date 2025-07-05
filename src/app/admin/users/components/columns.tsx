@@ -19,11 +19,11 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 import { useState } from "react";
-import { UserForm } from "./userForm";
 import { useDeleteUser, useUpdateUser } from "@/hooks/useUsers";
 import { Checkbox } from "@/components/ui/checkbox";
-import ConfirmationDialog from "@/components/shared/ConfirmationDialog"; // Pastikan path ini benar
+import ConfirmationDialog from "@/components/shared/ConfirmationDialog";
 import { toast } from "sonner";
+import { UserForm } from "./userForm";
 
 export type User = {
     id: string;
