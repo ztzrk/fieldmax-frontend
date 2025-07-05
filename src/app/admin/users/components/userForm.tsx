@@ -21,6 +21,8 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { UserFormValues, userSchema } from "@/lib/schema/user.schema";
+import { InputField } from "@/components/shared/form/InputField";
+import { SelectField } from "@/components/shared/form/SelectField";
 
 interface UserFormProps {
     initialData?: Partial<UserFormValues>;
@@ -43,93 +45,41 @@ export function UserForm({ initialData, onSubmit, isPending }: UserFormProps) {
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <FormField
+                <InputField
                     control={form.control}
                     name="fullName"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Full Name</FormLabel>
-                            <FormControl>
-                                <Input placeholder="Budi Setiawan" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
+                    label="Full Name"
+                    placeholder="Budi Setiawan"
                 />
-                <FormField
+                <InputField
                     control={form.control}
                     name="email"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Email</FormLabel>
-                            <FormControl>
-                                <Input
-                                    type="email"
-                                    placeholder="budi@example.com"
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
+                    label="Email"
+                    placeholder="budi@example.com"
+                    type="email"
                 />
-                <FormField
+                <InputField
                     control={form.control}
                     name="password"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Password</FormLabel>
-                            <FormControl>
-                                <Input type="password" {...field} />
-                            </FormControl>
-                            <FormDescription>
-                                {initialData
-                                    ? "Kosongkan jika tidak ingin mengubah password."
-                                    : "Minimal 8 karakter."}
-                            </FormDescription>
-                            <FormMessage />
-                        </FormItem>
-                    )}
+                    label="Password"
+                    placeholder="********"
+                    type="password"
                 />
-                <FormField
+                <InputField
                     control={form.control}
                     name="phoneNumber"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Phone Number</FormLabel>
-                            <FormControl>
-                                <Input placeholder="08123456789" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
+                    label="Phone Number"
+                    placeholder="08123456789"
                 />
-                <FormField
+                <SelectField
                     control={form.control}
                     name="role"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Role</FormLabel>
-                            <Select
-                                onValueChange={field.onChange}
-                                defaultValue={field.value}
-                            >
-                                <FormControl>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select a role" />
-                                    </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                    <SelectItem value="USER">User</SelectItem>
-                                    <SelectItem value="RENTER">
-                                        Renter
-                                    </SelectItem>
-                                    <SelectItem value="ADMIN">Admin</SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <FormMessage />
-                        </FormItem>
-                    )}
+                    label="Role"
+                    options={[
+                        { value: "USER", label: "User" },
+                        { value: "RENTER", label: "Renter" },
+                        { value: "ADMIN", label: "Admin" },
+                    ]}
                 />
                 <Button type="submit" disabled={isPending} className="w-full">
                     {isPending ? "Saving..." : "Save Changes"}
