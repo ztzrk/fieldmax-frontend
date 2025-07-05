@@ -1,7 +1,7 @@
 "use client";
 
 import { columns } from "./components/columns";
-import { DataTable } from "./components/data-table";
+import { DataTable } from "../../../components/shared/DataTable";
 import { FullScreenLoader } from "@/components/FullScreenLoader";
 import { CreateUserButton } from "./components/createUserButton";
 import { useGetAllUsers } from "@/hooks/useUsers";
