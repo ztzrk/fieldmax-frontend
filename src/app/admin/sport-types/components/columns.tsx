@@ -84,7 +84,7 @@ const ActionsCell = ({ sportType }: { sportType: SportType }) => {
                                 className="text-red-500"
                                 onSelect={(e) => e.preventDefault()}
                             >
-                                Delete
+                                Delete Sport Type
                             </DropdownMenuItem>
                         }
                         title="Are you sure?"
@@ -134,7 +134,7 @@ export const columns: ColumnDef<SportType>[] = [
         enableHiding: false,
     },
     { accessorKey: "name", header: "Name" },
-    { accessorKey: "iconUrl", header: "Icon URL" },
+    { accessorKey: "iconName", header: "Icon" },
     {
         id: "actions",
         cell: ({ row }) => <ActionsCell sportType={row.original} />,
