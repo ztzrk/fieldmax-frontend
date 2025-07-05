@@ -10,9 +10,9 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
-import { UserForm } from "./userForm";
 import { toast } from "sonner";
 import { useCreateUser } from "@/hooks/useUsers";
+import { UserForm } from "./userForm";
 
 export function CreateUserButton() {
     const [isOpen, setIsOpen] = useState(false);
