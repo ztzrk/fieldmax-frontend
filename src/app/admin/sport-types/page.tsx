@@ -13,8 +13,8 @@ import {
 } from "@/components/ui/dialog";
 import { SportTypeForm } from "./components/SportTypeForm";
 import { useState } from "react";
-import { DataTable } from "../users/components/data-table";
 import { toast } from "sonner";
+import { DataTable } from "@/components/shared/DataTable";
 
 export default function AdminSportTypesPage() {
     const { data: sportTypes, isLoading, isError } = useGetAllSportTypes();
