@@ -53,6 +53,7 @@ export function VenueForm({
                     control={form.control}
                     name="renterId"
                     label="Renter (Owner)"
+                    placeholder="Select a renter"
                     options={renters.map((renter) => ({
                         value: renter.id,
                         label: renter.fullName,
