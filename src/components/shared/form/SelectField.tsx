@@ -22,6 +22,9 @@ interface SelectFieldProps {
     label: string;
     placeholder?: string;
     options: { value: string; label: string }[];
+    disabled?: boolean;
+    required?: boolean;
+    isFullWidth?: boolean;
 }
 
 export function SelectField({
@@ -30,6 +33,9 @@ export function SelectField({
     label,
     placeholder,
     options,
+    disabled,
+    required,
+    isFullWidth = true,
 }: SelectFieldProps) {
     return (
         <FormField
@@ -39,12 +45,16 @@ export function SelectField({
                 <FormItem>
                     <FormLabel>{label}</FormLabel>
                     <Select
+                        required={required}
+                        disabled={disabled}
                         onValueChange={field.onChange}
                         defaultValue={field.value}
                         value={field.value}
                     >
                         <FormControl>
-                            <SelectTrigger>
+                            <SelectTrigger
+                                className={`${isFullWidth ? "w-full" : ""}`}
+                            >
                                 <SelectValue placeholder={placeholder} />
                             </SelectTrigger>
                         </FormControl>
