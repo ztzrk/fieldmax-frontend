@@ -17,6 +17,10 @@ const SportTypeService = {
         const response = await api.delete(`/sport-types/${id}`);
         return response.data.data;
     },
+    deleteMultiple: async (ids: string[]) => {
+        const response = await api.post("/sport-types/multiple", { ids });
+        return response.data.data;
+    },
 };
 
 export default SportTypeService;
