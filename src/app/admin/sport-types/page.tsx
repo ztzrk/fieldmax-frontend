@@ -1,38 +1,21 @@
 "use client";
 
 import { columns } from "./components/columns";
-import { useGetAllSportTypes, useCreateSportType } from "@/hooks/useSportTypes";
-import { FullScreenLoader } from "@/components/FullScreenLoader";
-import { Button } from "@/components/ui/button";
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog";
-import { SportTypeForm } from "./components/SportTypeForm";
-import { useState } from "react";
-import { toast } from "sonner";
 import { DataTable } from "@/components/shared/DataTable";
+import {
+    useGetAllSportTypes,
+    useDeleteMultipleSportTypes,
+} from "@/hooks/useSportTypes";
+import { FullScreenLoader } from "@/components/FullScreenLoader";
+import CreateSportTypeButton from "./components/CreateSportTypeButton";
 
 export default function AdminSportTypesPage() {
     const { data: sportTypes, isLoading, isError } = useGetAllSportTypes();
-    const { mutate: createSportType, isPending } = useCreateSportType();
-    const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+    const { mutate: deleteMultiple, isPending: isDeleting } =
+        useDeleteMultipleSportTypes();
 
-    const handleSubmit = async (data: any) => {
-        createSportType(data, {
-            onSuccess: () => {
-                toast.success(`${data.name} created successfully`);
-                setIsCreateDialogOpen(false);
-            },
-            onError: (error) => {
-                toast.error(
-                    `Failed to create ${data.name} error: ${error.message}`
-                );
-            },
-        });
+    const handleDeleteSelected = async (selectedIds: string[]) => {
+        deleteMultiple(selectedIds);
     };
 
     if (isLoading) return <FullScreenLoader />;
@@ -47,25 +30,13 @@ export default function AdminSportTypesPage() {
                         Manage available sport types.
                     </p>
                 </div>
-                <Dialog
-                    open={isCreateDialogOpen}
-                    onOpenChange={setIsCreateDialogOpen}
-                >
-                    <DialogTrigger asChild>
-                        <Button>Create Sport Type</Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>Create New Sport Type</DialogTitle>
-                        </DialogHeader>
-                        <SportTypeForm
-                            onSubmit={handleSubmit}
-                            isPending={isPending}
-                        />
-                    </DialogContent>
-                </Dialog>
+                <CreateSportTypeButton />
             </div>
-            <DataTable columns={columns} data={sportTypes || []} />
+            <DataTable
+                columns={columns}
+                data={sportTypes || []}
+                onDeleteSelected={handleDeleteSelected}
+            />
         </div>
     );
 }
