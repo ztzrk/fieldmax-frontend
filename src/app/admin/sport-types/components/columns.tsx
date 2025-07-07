@@ -8,7 +8,6 @@ import {
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuLabel,
-    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -21,44 +20,23 @@ import {
 import { useState } from "react";
 import { SportTypeForm } from "./SportTypeForm";
 import { useUpdateSportType, useDeleteSportType } from "@/hooks/useSportTypes";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Icon } from "@/components/shared/IconMap";
 import ConfirmationDialog from "@/components/shared/ConfirmationDialog";
-import { Checkbox } from "@radix-ui/react-checkbox";
-import { toast } from "sonner";
 
 export type SportType = {
     id: string;
     name: string;
-    iconUrl?: string;
+    iconName?: string | null;
 };
 
 const ActionsCell = ({ sportType }: { sportType: SportType }) => {
-    const [isOpen, setIsOpen] = useState(false);
+    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
     const { mutate: deleteSportType } = useDeleteSportType();
-    const { mutate: updateSportType, isPending } = useUpdateSportType();
-
-    const handleDelete = async () => {
-        deleteSportType(sportType.id);
-    };
-
-    const handleEditSubmit = async (data: any) => {
-        updateSportType(
-            { id: sportType.id, data },
-            {
-                onSuccess: () => {
-                    toast.success(`${sportType.name} updated successfully`);
-                    setIsOpen(false);
-                },
-                onError: (error) => {
-                    toast.error(
-                        `Failed to update ${sportType.name} error: ${error.message}`
-                    );
-                },
-            }
-        );
-    };
+    const { mutate: updateSportType } = useUpdateSportType();
 
     return (
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="h-8 w-8 p-0">
@@ -67,14 +45,6 @@ const ActionsCell = ({ sportType }: { sportType: SportType }) => {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                     <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                    <DropdownMenuItem
-                        onClick={() =>
-                            navigator.clipboard.writeText(sportType.id)
-                        }
-                    >
-                        Copy sport type ID
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
                     <DialogTrigger asChild>
                         <DropdownMenuItem>Edit</DropdownMenuItem>
                     </DialogTrigger>
@@ -84,13 +54,12 @@ const ActionsCell = ({ sportType }: { sportType: SportType }) => {
                                 className="text-red-500"
                                 onSelect={(e) => e.preventDefault()}
                             >
-                                Delete Sport Type
+                                Delete
                             </DropdownMenuItem>
                         }
                         title="Are you sure?"
                         description={`This will permanently delete the "${sportType.name}" sport type.`}
-                        action="Delete"
-                        onConfirm={handleDelete}
+                        onConfirm={() => deleteSportType(sportType.id)}
                     />
                 </DropdownMenuContent>
             </DropdownMenu>
@@ -99,9 +68,17 @@ const ActionsCell = ({ sportType }: { sportType: SportType }) => {
                     <DialogTitle>Edit Sport Type</DialogTitle>
                 </DialogHeader>
                 <SportTypeForm
-                    initialData={sportType}
-                    onSubmit={handleEditSubmit}
-                    isPending={isPending}
+                    initialData={{
+                        name: sportType.name,
+                        iconName: sportType.iconName || undefined,
+                    }}
+                    onSubmit={async (data) =>
+                        updateSportType(
+                            { id: sportType.id, data },
+                            { onSuccess: () => setIsEditDialogOpen(false) }
+                        )
+                    }
+                    isPending={false}
                 />
             </DialogContent>
         </Dialog>
@@ -133,8 +110,18 @@ export const columns: ColumnDef<SportType>[] = [
         enableSorting: false,
         enableHiding: false,
     },
-    { accessorKey: "name", header: "Name" },
-    { accessorKey: "iconName", header: "Icon" },
+    {
+        accessorKey: "name",
+        header: "Name",
+    },
+    {
+        accessorKey: "iconName",
+        header: "Icon",
+        cell: ({ row }) => {
+            const iconName = row.getValue("iconName") as string | undefined;
+            return <Icon name={iconName} className="h-6 w-6" />;
+        },
+    },
     {
         id: "actions",
         cell: ({ row }) => <ActionsCell sportType={row.original} />,
