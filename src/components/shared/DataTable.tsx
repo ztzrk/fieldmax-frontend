@@ -19,21 +19,19 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import UserService from "@/services/user.service";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 import ConfirmationDialog from "@/components/shared/ConfirmationDialog";
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
     data: TData[];
+    onDeleteSelected?: (selectedIds: string[]) => Promise<void>;
 }
 
 export function DataTable<TData, TValue>({
     columns,
     data,
+    onDeleteSelected,
 }: DataTableProps<TData, TValue>) {
-    const router = useRouter();
     const [sorting, setSorting] = useState<SortingState>([]);
     const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
@@ -44,43 +42,44 @@ export function DataTable<TData, TValue>({
         onSortingChange: setSorting,
         getSortedRowModel: getSortedRowModel(),
         onRowSelectionChange: setRowSelection,
+        enableRowSelection: true,
         state: {
             sorting,
             rowSelection,
         },
     });
 
-    const handleDeleteSelected = async () => {
-        try {
-            const selectedIds = table
-                .getFilteredSelectedRowModel()
-                .rows.map((row) => (row.original as any).id);
+    const handleDelete = async () => {
+        const selectedIds = table
+            .getFilteredSelectedRowModel()
+            .rows.map((row) => (row.original as any).id);
 
-            await UserService.deleteMultipleUsers(selectedIds);
-            toast.success(
-                `${selectedIds.length} user(s) deleted successfully.`
-            );
-            router.refresh();
+        if (onDeleteSelected) {
+            await onDeleteSelected(selectedIds);
             table.resetRowSelection();
-        } catch (error) {
-            toast.error("Failed to delete selected users.");
         }
     };
 
     return (
         <div>
             <div className="flex items-center py-4">
-                {Object.keys(rowSelection).length > 0 && (
+                {onDeleteSelected && Object.keys(rowSelection).length > 0 && (
                     <ConfirmationDialog
                         trigger={
-                            <Button variant="destructive" className="mr-2">
-                                Delete Selected
+                            <Button
+                                variant="destructive"
+                                size="sm"
+                                className="mr-4"
+                            >
+                                Delete {Object.keys(rowSelection).length}{" "}
+                                selected
                             </Button>
                         }
-                        title="Delete Confirmation"
-                        description="Are you sure you want to delete the selected users?"
-                        onConfirm={handleDeleteSelected}
-                        action="Delete"
+                        title={`Are you sure you want to delete ${
+                            Object.keys(rowSelection).length
+                        } item(s)?`}
+                        description="This action cannot be undone."
+                        onConfirm={handleDelete}
                     />
                 )}
             </div>
