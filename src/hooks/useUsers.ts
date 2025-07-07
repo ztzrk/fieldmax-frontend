@@ -51,3 +51,17 @@ export function useDeleteUser() {
         },
     });
 }
+
+export function useDeleteMultipleUsers() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: UserService.deleteMultipleUsers,
+        onSuccess: () => {
+            toast.success("Users deleted successfully.");
+            queryClient.invalidateQueries({ queryKey: ["users"] });
+        },
+        onError: () => {
+            toast.error("Failed to delete users.");
+        },
+    });
+}
