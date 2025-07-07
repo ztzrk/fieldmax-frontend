@@ -1,25 +1,27 @@
 "use client";
 
 import { columns } from "./components/columns";
-import { DataTable } from "../../../components/shared/DataTable";
+import { DataTable } from "@/components/shared/DataTable";
+import { useGetAllUsers, useDeleteMultipleUsers } from "@/hooks/useUsers";
 import { FullScreenLoader } from "@/components/FullScreenLoader";
 import { CreateUserButton } from "./components/createUserButton";
-import { useGetAllUsers } from "@/hooks/useUsers";
 
 export default function AdminUsersPage() {
     const { data: users, isLoading, isError } = useGetAllUsers();
+    const { mutate: deleteMultiple, isPending: isDeleting } =
+        useDeleteMultipleUsers();
 
-    if (isLoading) {
-        return <FullScreenLoader />;
-    }
+    const handleDeleteUsers = async (selectedIds: string[]) => {
+        if (selectedIds.length === 0) return;
+        try {
+            deleteMultiple(selectedIds);
+        } catch (error) {
+            console.error("Error deleting users:", error);
+        }
+    };
 
-    if (isError) {
-        return (
-            <div className="flex justify-center items-center h-full">
-                <p className="text-red-500">Failed to load users data.</p>
-            </div>
-        );
-    }
+    if (isLoading) return <FullScreenLoader />;
+    if (isError) return <p className="text-red-500">Error loading data.</p>;
 
     return (
         <div>
@@ -32,7 +34,11 @@ export default function AdminUsersPage() {
                 </div>
                 <CreateUserButton />
             </div>
-            <DataTable columns={columns} data={users || []} />
+            <DataTable
+                columns={columns}
+                data={users || []}
+                onDeleteSelected={handleDeleteUsers}
+            />
         </div>
     );
 }
