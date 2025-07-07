@@ -17,7 +17,7 @@ import {
     sportTypeSchema,
 } from "@/lib/schema/sport-types.schema";
 import { IconCombobox } from "@/components/shared/IconComboBox";
-import { on } from "events";
+import { InputField } from "@/components/shared/form/InputField";
 
 interface SportTypeFormProps {
     initialData?: Partial<SportTypeFormValues>;
@@ -38,18 +38,11 @@ export function SportTypeForm({
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <FormField
+                <InputField
                     control={form.control}
                     name="name"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Name</FormLabel>
-                            <FormControl>
-                                <Input placeholder="Futsal" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
+                    label="Name"
+                    placeholder="Futsal"
                 />
                 <FormField
                     control={form.control}
