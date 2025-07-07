@@ -29,6 +29,10 @@ const VenueService = {
         const response = await api.delete(`/venues/${id}`);
         return response.data.data;
     },
+    deleteMultiple: async (ids: string[]) => {
+        const response = await api.post("/venues/multiple", { ids });
+        return response.data.data;
+    },
 };
 
 export default VenueService;
