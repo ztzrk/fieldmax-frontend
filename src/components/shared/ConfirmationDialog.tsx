@@ -16,13 +16,11 @@ function ConfirmationDialog({
     trigger,
     title,
     description,
-    action,
     onConfirm,
 }: {
     trigger: React.ReactNode;
     title: string;
     description: string;
-    action: string;
     onConfirm: () => void;
 }) {
     return (
@@ -45,7 +43,7 @@ function ConfirmationDialog({
                 <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
                     <AlertDialogAction onClick={onConfirm}>
-                        {action}
+                        Delete
                     </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
