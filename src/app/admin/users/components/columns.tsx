@@ -89,7 +89,6 @@ const ActionsCell = ({ user }: { user: User }) => {
                         }
                         title="Are you absolutely sure?"
                         description="This action cannot be undone. This will permanently delete the user account."
-                        action="Continue"
                         onConfirm={handleDelete}
                     />
                 </DropdownMenuContent>
