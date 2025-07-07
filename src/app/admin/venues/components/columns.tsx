@@ -20,28 +20,15 @@ import {
 } from "@/components/ui/dialog";
 import { useState } from "react";
 import { VenueForm } from "./VenueForm";
-import { useUpdateSportType, useDeleteSportType } from "@/hooks/useSportTypes";
+import { useUpdateVenue, useDeleteVenue } from "@/hooks/useVenues";
 import ConfirmationDialog from "@/components/shared/ConfirmationDialog";
-import { Checkbox } from "@radix-ui/react-checkbox";
-import { toast } from "sonner";
+import { Checkbox } from "@/components/ui/checkbox";
+import { VenueListItem } from "@/lib/schema/venue.schema";
 
-export type Venue = {
-    id: string;
-    name: string;
-    address: string;
-    renter: {
-        fullName: string;
-        email: string;
-    };
-    description?: string;
-    mainPhotoUrl?: string;
-    createdAt: string;
-};
-
-const ActionsCell = ({ venue }: { venue: Venue }) => {
-    const [isOpen, setIsOpen] = useState(false);
-    const { mutate: deleteVenue } = useDeleteSportType();
-    const { mutate: updateVenue, isPending } = useUpdateSportType();
+const ActionsCell = ({ venue }: { venue: VenueListItem }) => {
+    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+    const { mutate: deleteVenue } = useDeleteVenue();
+    const { mutate: updateVenue, isPending } = useUpdateVenue();
 
     const handleDelete = async () => {
         deleteVenue(venue.id);
@@ -52,20 +39,14 @@ const ActionsCell = ({ venue }: { venue: Venue }) => {
             { id: venue.id, data },
             {
                 onSuccess: () => {
-                    toast.success(`${venue.name} updated successfully`);
-                    setIsOpen(false);
-                },
-                onError: (error) => {
-                    toast.error(
-                        `Failed to update ${venue.name} error: ${error.message}`
-                    );
+                    setIsEditDialogOpen(false);
                 },
             }
         );
     };
 
     return (
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="h-8 w-8 p-0">
@@ -81,7 +62,7 @@ const ActionsCell = ({ venue }: { venue: Venue }) => {
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DialogTrigger asChild>
-                        <DropdownMenuItem>Edit</DropdownMenuItem>
+                        <DropdownMenuItem>Edit Venue</DropdownMenuItem>
                     </DialogTrigger>
                     <ConfirmationDialog
                         trigger={
@@ -89,19 +70,18 @@ const ActionsCell = ({ venue }: { venue: Venue }) => {
                                 className="text-red-500"
                                 onSelect={(e) => e.preventDefault()}
                             >
-                                Delete Sport Type
+                                Delete Venue
                             </DropdownMenuItem>
                         }
                         title="Are you sure?"
                         description={`This will permanently delete the "${venue.name}" venue.`}
-                        action="Delete"
                         onConfirm={handleDelete}
                     />
                 </DropdownMenuContent>
             </DropdownMenu>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Edit Sport Type</DialogTitle>
+                    <DialogTitle>Edit Venue</DialogTitle>
                 </DialogHeader>
                 <VenueForm
                     initialData={venue}
@@ -113,7 +93,7 @@ const ActionsCell = ({ venue }: { venue: Venue }) => {
     );
 };
 
-export const columns: ColumnDef<Venue>[] = [
+export const columns: ColumnDef<VenueListItem>[] = [
     {
         id: "select",
         header: ({ table }) => (
@@ -146,23 +126,12 @@ export const columns: ColumnDef<Venue>[] = [
         header: "Created At",
         cell: ({ row }) => {
             const date = new Date(row.original.createdAt);
-            return date.toLocaleDateString("en-US", {
+            return date.toLocaleDateString("id-ID", {
                 year: "numeric",
                 month: "long",
                 day: "numeric",
             });
         },
-    },
-    {
-        accessorKey: "mainPhotoUrl",
-        header: "Main Photo",
-        cell: ({ row }) => (
-            <img
-                src={row.original.mainPhotoUrl}
-                alt={row.original.name}
-                className="h-10 w-10 object-cover rounded"
-            />
-        ),
     },
     {
         id: "actions",
