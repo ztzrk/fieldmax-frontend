@@ -47,7 +47,7 @@ const UserService = {
     },
     deleteMultipleUsers: async (userIds: string[]) => {
         try {
-            const response = await api.post("/users/bulk-delete", {
+            const response = await api.post("/users/multiple", {
                 ids: userIds,
             });
             return response.data;
