@@ -57,3 +57,17 @@ export function useDeleteSportType() {
         },
     });
 }
+
+export function useDeleteMultipleSportTypes() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (ids: string[]) => SportTypeService.deleteMultiple(ids),
+        onSuccess: () => {
+            toast.success("Sport Types deleted successfully.");
+            queryClient.invalidateQueries({ queryKey: ["sport-types"] });
+        },
+        onError: (error) => {
+            toast.error(error.message || "Failed to delete sport types.");
+        },
+    });
+}
