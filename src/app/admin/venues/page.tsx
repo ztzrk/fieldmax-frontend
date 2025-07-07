@@ -2,12 +2,22 @@
 
 import { columns } from "./components/columns";
 import { DataTable } from "@/components/shared/DataTable";
-import { useGetAllVenues } from "@/hooks/useVenues";
+import { useDeleteMultipleVenues, useGetAllVenues } from "@/hooks/useVenues";
 import { FullScreenLoader } from "@/components/FullScreenLoader";
 import { CreateVenueButton } from "./components/CreateVenueButton";
 
 export default function AdminVenuesPage() {
     const { data: venues, isLoading, isError } = useGetAllVenues();
+    const { mutate: deleteMultiple, isPending: isDeleting } =
+        useDeleteMultipleVenues();
+    const handleDeleteVenues = async (selectedIds: string[]) => {
+        if (selectedIds.length === 0) return;
+        try {
+            deleteMultiple(selectedIds);
+        } catch (error) {
+            console.error("Error deleting venues:", error);
+        }
+    };
 
     if (isLoading) return <FullScreenLoader />;
     if (isError) return <p className="text-red-500">Error loading data.</p>;
@@ -23,7 +33,11 @@ export default function AdminVenuesPage() {
                 </div>
                 <CreateVenueButton />
             </div>
-            <DataTable columns={columns} data={venues || []} />
+            <DataTable
+                columns={columns}
+                data={venues || []}
+                onDeleteSelected={handleDeleteVenues}
+            />
         </div>
     );
 }
