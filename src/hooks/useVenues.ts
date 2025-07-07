@@ -51,3 +51,17 @@ export function useDeleteVenue() {
         },
     });
 }
+
+export function useDeleteMultipleVenues() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (ids: string[]) => VenueService.deleteMultiple(ids),
+        onSuccess: () => {
+            toast.success("Venues deleted successfully.");
+            queryClient.invalidateQueries({ queryKey: ["venues"] });
+        },
+        onError: (error) => {
+            toast.error(error.message || "Failed to delete venues.");
+        },
+    });
+}
