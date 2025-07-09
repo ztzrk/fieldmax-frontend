@@ -65,3 +65,29 @@ export function useDeleteMultipleVenues() {
         },
     });
 }
+export function useApproveVenue() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (id: string) => VenueService.approve(id),
+        onSuccess: () => {
+            toast.success("Venue approved successfully!");
+            queryClient.invalidateQueries({ queryKey: ["venues"] });
+        },
+        onError: (error) => {
+            toast.error(error.message || "Failed to approve venue.");
+        },
+    });
+}
+export function useRejectVenue() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (id: string) => VenueService.reject(id),
+        onSuccess: () => {
+            toast.success("Venue rejected successfully!");
+            queryClient.invalidateQueries({ queryKey: ["venues"] });
+        },
+        onError: (error) => {
+            toast.error(error.message || "Failed to reject venue.");
+        },
+    });
+}
