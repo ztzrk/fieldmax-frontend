@@ -9,7 +9,8 @@ export const venueSchema = z.object({
         .string()
         .url({ message: "Must be a valid URL." })
         .optional()
-        .or(z.literal("")),
+        .or(z.literal(""))
+        .nullable(),
 });
 
 export type VenueFormValues = z.infer<typeof venueSchema>;
@@ -23,8 +24,9 @@ export const venueListItemSchema = z.object({
         email: z.string().email(),
     }),
     description: z.string().optional(),
-    mainPhotoUrl: z.string().url().optional(),
+    mainPhotoUrl: z.string().url().optional().nullable(),
     createdAt: z.string(),
+    status: z.enum(["PENDING", "APPROVED", "REJECTED"]),
 });
 
 export const venuesListApiResponseSchema = z.array(venueListItemSchema);
