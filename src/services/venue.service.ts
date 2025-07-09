@@ -33,6 +33,14 @@ const VenueService = {
         const response = await api.post("/venues/multiple", { ids });
         return response.data.data;
     },
+    approve: async (id: string) => {
+        const response = await api.patch(`/venues/${id}/approve`);
+        return response.data.data;
+    },
+    reject: async (id: string) => {
+        const response = await api.patch(`/venues/${id}/reject`);
+        return response.data.data;
+    },
 };
 
 export default VenueService;
