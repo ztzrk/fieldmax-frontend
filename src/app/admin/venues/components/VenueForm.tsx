@@ -30,7 +30,7 @@ export function VenueForm({
             address: "",
             renterId: "",
             description: "",
-            mainPhotoUrl: "",
+            mainPhotoUrl: null,
         },
     });
 
@@ -64,12 +64,6 @@ export function VenueForm({
                     name="description"
                     label="Description"
                     placeholder="Enter venue description"
-                />
-                <InputField
-                    control={form.control}
-                    name="mainPhotoUrl"
-                    label="Main Photo URL"
-                    placeholder="Enter main photo URL"
                 />
                 <Button type="submit" disabled={isPending} className="w-full">
                     {isPending ? "Saving..." : "Save"}
