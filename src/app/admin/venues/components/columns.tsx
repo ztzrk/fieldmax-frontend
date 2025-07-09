@@ -20,30 +20,59 @@ import {
 } from "@/components/ui/dialog";
 import { useState } from "react";
 import { VenueForm } from "./VenueForm";
-import { useUpdateVenue, useDeleteVenue } from "@/hooks/useVenues";
+import {
+    useUpdateVenue,
+    useDeleteVenue,
+    useApproveVenue,
+    useRejectVenue,
+} from "@/hooks/useVenues";
 import ConfirmationDialog from "@/components/shared/ConfirmationDialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { VenueListItem } from "@/lib/schema/venue.schema";
+import Image from "next/image";
+import { Badge } from "@/components/ui/badge";
+
+const VerificationCell = ({ venue }: { venue: VenueListItem }) => {
+    const { mutate: approveVenue } = useApproveVenue();
+    const { mutate: rejectVenue } = useRejectVenue();
+
+    if (venue.status === "APPROVED") {
+        return <Badge variant="default">Approved</Badge>;
+    }
+    if (venue.status === "REJECTED") {
+        return <Badge variant="destructive">Rejected</Badge>;
+    }
+
+    return (
+        <div className="flex gap-2">
+            <ConfirmationDialog
+                trigger={
+                    <Button variant="outline" size="sm">
+                        Approve
+                    </Button>
+                }
+                title="Approve this venue?"
+                description="This venue will become public and bookable."
+                onConfirm={() => approveVenue(venue.id)}
+            />
+            <ConfirmationDialog
+                trigger={
+                    <Button variant="destructive" size="sm">
+                        Reject
+                    </Button>
+                }
+                title="Reject this venue?"
+                description="This venue will be marked as rejected."
+                onConfirm={() => rejectVenue(venue.id)}
+            />
+        </div>
+    );
+};
 
 const ActionsCell = ({ venue }: { venue: VenueListItem }) => {
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
     const { mutate: deleteVenue } = useDeleteVenue();
     const { mutate: updateVenue, isPending } = useUpdateVenue();
-
-    const handleDelete = async () => {
-        deleteVenue(venue.id);
-    };
-
-    const handleEditSubmit = async (data: any) => {
-        updateVenue(
-            { id: venue.id, data },
-            {
-                onSuccess: () => {
-                    setIsEditDialogOpen(false);
-                },
-            }
-        );
-    };
 
     return (
         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
@@ -55,27 +84,22 @@ const ActionsCell = ({ venue }: { venue: VenueListItem }) => {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                     <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                    <DropdownMenuItem
-                        onClick={() => navigator.clipboard.writeText(venue.id)}
-                    >
-                        Copy venue ID
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
                     <DialogTrigger asChild>
-                        <DropdownMenuItem>Edit Venue</DropdownMenuItem>
+                        <DropdownMenuItem>Edit</DropdownMenuItem>
                     </DialogTrigger>
+                    <DropdownMenuSeparator />
                     <ConfirmationDialog
                         trigger={
                             <DropdownMenuItem
                                 className="text-red-500"
                                 onSelect={(e) => e.preventDefault()}
                             >
-                                Delete Venue
+                                Delete
                             </DropdownMenuItem>
                         }
-                        title="Are you sure?"
+                        title="Are you absolutely sure?"
                         description={`This will permanently delete the "${venue.name}" venue.`}
-                        onConfirm={handleDelete}
+                        onConfirm={() => deleteVenue(venue.id)}
                     />
                 </DropdownMenuContent>
             </DropdownMenu>
@@ -85,7 +109,12 @@ const ActionsCell = ({ venue }: { venue: VenueListItem }) => {
                 </DialogHeader>
                 <VenueForm
                     initialData={venue}
-                    onSubmit={handleEditSubmit}
+                    onSubmit={async (data) =>
+                        updateVenue(
+                            { id: venue.id, data },
+                            { onSuccess: () => setIsEditDialogOpen(false) }
+                        )
+                    }
                     isPending={isPending}
                 />
             </DialogContent>
@@ -94,44 +123,14 @@ const ActionsCell = ({ venue }: { venue: VenueListItem }) => {
 };
 
 export const columns: ColumnDef<VenueListItem>[] = [
-    {
-        id: "select",
-        header: ({ table }) => (
-            <Checkbox
-                checked={
-                    table.getIsAllPageRowsSelected() ||
-                    (table.getIsSomePageRowsSelected() && "indeterminate")
-                }
-                onCheckedChange={(value) =>
-                    table.toggleAllPageRowsSelected(!!value)
-                }
-                aria-label="Select all"
-            />
-        ),
-        cell: ({ row }) => (
-            <Checkbox
-                checked={row.getIsSelected()}
-                onCheckedChange={(value) => row.toggleSelected(!!value)}
-                aria-label="Select row"
-            />
-        ),
-        enableSorting: false,
-        enableHiding: false,
-    },
+    // Kolom "select"
+    { id: "select" /* ... */ },
     { accessorKey: "name", header: "Name" },
-    { accessorKey: "address", header: "Address" },
-    { accessorKey: "renter.fullName", header: "Renter (Owner)" },
+    { accessorKey: "renter.fullName", header: "Renter" },
     {
-        accessorKey: "createdAt",
-        header: "Created At",
-        cell: ({ row }) => {
-            const date = new Date(row.original.createdAt);
-            return date.toLocaleDateString("id-ID", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-            });
-        },
+        id: "verification",
+        header: "Verification Status",
+        cell: ({ row }) => <VerificationCell venue={row.original} />,
     },
     {
         id: "actions",
