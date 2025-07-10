@@ -24,7 +24,7 @@ export const venueListItemSchema = z.object({
         email: z.string().email(),
     }),
     description: z.string().optional(),
-    mainPhotoUrl: z.string().url().optional().nullable(),
+    mainPhotoUrl: z.string().optional().nullable(),
     createdAt: z.string(),
     status: z.enum(["PENDING", "APPROVED", "REJECTED"]),
 });
