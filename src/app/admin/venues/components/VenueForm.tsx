@@ -4,10 +4,18 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { VenueFormValues, venueSchema } from "@/lib/schema/venue.schema";
 import { useGetAllUsers } from "@/hooks/useUsers";
-import { Form } from "@/components/ui/form";
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { InputField } from "@/components/shared/form/InputField";
 import { SelectField } from "@/components/shared/form/SelectField";
+import { ImageUploader } from "@/components/shared/form/ImageUploader";
 
 interface VenueFormProps {
     initialData?: Partial<VenueFormValues>;
@@ -20,8 +28,13 @@ export function VenueForm({
     onSubmit,
     isPending,
 }: VenueFormProps) {
-    const { data: usersData } = useGetAllUsers();
+    const { data: usersData, isLoading: isLoadingUsers } = useGetAllUsers();
     const renters = usersData?.filter((user) => user.role === "RENTER") || [];
+
+    const renterOptions = renters.map((renter) => ({
+        value: renter.id,
+        label: renter.fullName,
+    }));
 
     const form = useForm<VenueFormValues>({
         resolver: zodResolver(venueSchema),
@@ -30,7 +43,7 @@ export function VenueForm({
             address: "",
             renterId: "",
             description: "",
-            mainPhotoUrl: null,
+            mainPhotoUrl: "",
         },
     });
 
@@ -41,29 +54,41 @@ export function VenueForm({
                     control={form.control}
                     name="name"
                     label="Venue Name"
-                    placeholder="Enter venue name"
+                />
+                <InputField
+                    control={form.control}
+                    name="description"
+                    label="Description"
                 />
                 <InputField
                     control={form.control}
                     name="address"
                     label="Address"
-                    placeholder="Enter venue address"
                 />
                 <SelectField
                     control={form.control}
                     name="renterId"
                     label="Renter (Owner)"
                     placeholder="Select a renter"
-                    options={renters.map((renter) => ({
-                        value: renter.id,
-                        label: renter.fullName,
-                    }))}
+                    options={renterOptions}
                 />
-                <InputField
+                <FormField
                     control={form.control}
-                    name="description"
-                    label="Description"
-                    placeholder="Enter venue description"
+                    name="mainPhotoUrl"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Main Photo</FormLabel>
+                            <FormControl>
+                                <ImageUploader
+                                    initialImageUrl={field.value}
+                                    onUploadComplete={(url) =>
+                                        field.onChange(url)
+                                    }
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
                 />
                 <Button type="submit" disabled={isPending} className="w-full">
                     {isPending ? "Saving..." : "Save"}
