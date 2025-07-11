@@ -17,6 +17,10 @@ const VenueService = {
             throw error;
         }
     },
+    getById: async (id: string) => {
+        const response = await api.get(`/venues/${id}`);
+        return response.data.data;
+    },
     create: async (data: any) => {
         const response = await api.post("/venues", data);
         return response.data.data;
@@ -40,6 +44,10 @@ const VenueService = {
     reject: async (id: string) => {
         const response = await api.patch(`/venues/${id}/reject`);
         return response.data.data;
+    },
+    deletePhoto: async (photoId: string) => {
+        const response = await api.delete(`/venues/photos/${photoId}`);
+        return response.data;
     },
 };
 
