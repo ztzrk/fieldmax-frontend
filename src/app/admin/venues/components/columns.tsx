@@ -8,18 +8,10 @@ import {
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuLabel,
-    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog";
+import { Dialog } from "@/components/ui/dialog";
 import { useState } from "react";
-import { VenueForm } from "./VenueForm";
 import {
     useUpdateVenue,
     useDeleteVenue,
@@ -27,52 +19,15 @@ import {
     useRejectVenue,
 } from "@/hooks/useVenues";
 import ConfirmationDialog from "@/components/shared/ConfirmationDialog";
-import { Checkbox } from "@/components/ui/checkbox";
-import { VenueListItem } from "@/lib/schema/venue.schema";
-import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
+import { VenueApiResponse } from "@/lib/schema/venue.schema";
 
-const VerificationCell = ({ venue }: { venue: VenueListItem }) => {
-    const { mutate: approveVenue } = useApproveVenue();
-    const { mutate: rejectVenue } = useRejectVenue();
-
-    if (venue.status === "APPROVED") {
-        return <Badge variant="default">Approved</Badge>;
-    }
-    if (venue.status === "REJECTED") {
-        return <Badge variant="destructive">Rejected</Badge>;
-    }
-
-    return (
-        <div className="flex gap-2">
-            <ConfirmationDialog
-                trigger={
-                    <Button variant="outline" size="sm">
-                        Approve
-                    </Button>
-                }
-                title="Approve this venue?"
-                description="This venue will become public and bookable."
-                onConfirm={() => approveVenue(venue.id)}
-            />
-            <ConfirmationDialog
-                trigger={
-                    <Button variant="destructive" size="sm">
-                        Reject
-                    </Button>
-                }
-                title="Reject this venue?"
-                description="This venue will be marked as rejected."
-                onConfirm={() => rejectVenue(venue.id)}
-            />
-        </div>
-    );
-};
-
-const ActionsCell = ({ venue }: { venue: VenueListItem }) => {
+const ActionsCell = ({ venue }: { venue: VenueApiResponse }) => {
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
     const { mutate: deleteVenue } = useDeleteVenue();
-    const { mutate: updateVenue, isPending } = useUpdateVenue();
+    const { mutate: approveVenue } = useApproveVenue();
+    const { mutate: rejectVenue } = useRejectVenue();
 
     return (
         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
@@ -84,10 +39,39 @@ const ActionsCell = ({ venue }: { venue: VenueListItem }) => {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                     <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                    <DialogTrigger asChild>
-                        <DropdownMenuItem>Edit</DropdownMenuItem>
-                    </DialogTrigger>
-                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                        <Link href={`/admin/venues/${venue.id}/edit`}>
+                            View & Edit Details
+                        </Link>
+                    </DropdownMenuItem>
+                    {venue.status === "PENDING" && (
+                        <>
+                            <ConfirmationDialog
+                                trigger={
+                                    <DropdownMenuItem
+                                        onSelect={(e) => e.preventDefault()}
+                                    >
+                                        Approve
+                                    </DropdownMenuItem>
+                                }
+                                title="Approve this venue?"
+                                description="This venue will become public."
+                                onConfirm={() => approveVenue(venue.id)}
+                            />
+                            <ConfirmationDialog
+                                trigger={
+                                    <DropdownMenuItem
+                                        onSelect={(e) => e.preventDefault()}
+                                    >
+                                        Reject
+                                    </DropdownMenuItem>
+                                }
+                                title="Reject this venue?"
+                                description="This venue will be marked as rejected."
+                                onConfirm={() => rejectVenue(venue.id)}
+                            />
+                        </>
+                    )}
                     <ConfirmationDialog
                         trigger={
                             <DropdownMenuItem
@@ -97,43 +81,40 @@ const ActionsCell = ({ venue }: { venue: VenueListItem }) => {
                                 Delete
                             </DropdownMenuItem>
                         }
-                        title="Are you absolutely sure?"
+                        title="Are you sure?"
                         description={`This will permanently delete the "${venue.name}" venue.`}
                         onConfirm={() => deleteVenue(venue.id)}
                     />
                 </DropdownMenuContent>
             </DropdownMenu>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Edit Venue</DialogTitle>
-                </DialogHeader>
-                <VenueForm
-                    initialData={venue}
-                    onSubmit={async (data) =>
-                        updateVenue(
-                            { id: venue.id, data },
-                            { onSuccess: () => setIsEditDialogOpen(false) }
-                        )
-                    }
-                    isPending={isPending}
-                />
-            </DialogContent>
         </Dialog>
     );
 };
 
-export const columns: ColumnDef<VenueListItem>[] = [
-    // Kolom "select"
-    { id: "select" /* ... */ },
+export const columns: ColumnDef<VenueApiResponse>[] = [
+    { id: "select" /* ... checkbox ... */ },
     { accessorKey: "name", header: "Name" },
+    { accessorKey: "address", header: "Address" },
     { accessorKey: "renter.fullName", header: "Renter" },
     {
-        id: "verification",
-        header: "Verification Status",
-        cell: ({ row }) => <VerificationCell venue={row.original} />,
+        accessorKey: "status",
+        header: "Status",
+        cell: ({ row }) => {
+            const status = row.original.status;
+            return (
+                <Badge
+                    variant={
+                        status === "APPROVED"
+                            ? "default"
+                            : status === "REJECTED"
+                            ? "destructive"
+                            : "secondary"
+                    }
+                >
+                    {status}
+                </Badge>
+            );
+        },
     },
-    {
-        id: "actions",
-        cell: ({ row }) => <ActionsCell venue={row.original} />,
-    },
+    { id: "actions", cell: ({ row }) => <ActionsCell venue={row.original} /> },
 ];
