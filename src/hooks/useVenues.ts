@@ -9,6 +9,14 @@ export function useGetAllVenues() {
     });
 }
 
+export function useGetVenueById(id: string) {
+    return useQuery({
+        queryKey: ["venues", id],
+        queryFn: () => VenueService.getById(id),
+        enabled: !!id,
+    });
+}
+
 export function useCreateVenue() {
     const queryClient = useQueryClient();
     return useMutation({
@@ -88,6 +96,20 @@ export function useRejectVenue() {
         },
         onError: (error) => {
             toast.error(error.message || "Failed to reject venue.");
+        },
+    });
+}
+
+export function useDeleteVenuePhoto(venueId: string) {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (photoId: string) => VenueService.deletePhoto(photoId),
+        onSuccess: () => {
+            toast.success("Photo deleted successfully.");
+            queryClient.invalidateQueries({ queryKey: ["venue", venueId] });
+        },
+        onError: (error) => {
+            toast.error(error.message || "Failed to delete photo.");
         },
     });
 }
