@@ -4,18 +4,10 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { VenueFormValues, venueSchema } from "@/lib/schema/venue.schema";
 import { useGetAllUsers } from "@/hooks/useUsers";
-import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "@/components/ui/form";
+import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { InputField } from "@/components/shared/form/InputField";
 import { SelectField } from "@/components/shared/form/SelectField";
-import { ImageUploader } from "@/components/shared/form/ImageUploader";
 
 interface VenueFormProps {
     initialData?: Partial<VenueFormValues>;
@@ -28,9 +20,8 @@ export function VenueForm({
     onSubmit,
     isPending,
 }: VenueFormProps) {
-    const { data: usersData, isLoading: isLoadingUsers } = useGetAllUsers();
+    const { data: usersData } = useGetAllUsers();
     const renters = usersData?.filter((user) => user.role === "RENTER") || [];
-
     const renterOptions = renters.map((renter) => ({
         value: renter.id,
         label: renter.fullName,
@@ -43,7 +34,6 @@ export function VenueForm({
             address: "",
             renterId: "",
             description: "",
-            mainPhotoUrl: "",
         },
     });
 
@@ -57,11 +47,6 @@ export function VenueForm({
                 />
                 <InputField
                     control={form.control}
-                    name="description"
-                    label="Description"
-                />
-                <InputField
-                    control={form.control}
                     name="address"
                     label="Address"
                 />
@@ -72,23 +57,10 @@ export function VenueForm({
                     placeholder="Select a renter"
                     options={renterOptions}
                 />
-                <FormField
+                <InputField
                     control={form.control}
-                    name="mainPhotoUrl"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Main Photo</FormLabel>
-                            <FormControl>
-                                <ImageUploader
-                                    initialImageUrl={field.value}
-                                    onUploadComplete={(url) =>
-                                        field.onChange(url)
-                                    }
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
+                    name="description"
+                    label="Description"
                 />
                 <Button type="submit" disabled={isPending} className="w-full">
                     {isPending ? "Saving..." : "Save"}
