@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -9,25 +10,19 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
-import { toast } from "sonner";
-import { useCreateVenue } from "@/hooks/useVenues";
 import { VenueForm } from "./VenueForm";
+import { useCreateVenue } from "@/hooks/useVenues";
 
 export function CreateVenueButton() {
     const [isOpen, setIsOpen] = useState(false);
-
+    const router = useRouter();
     const { mutate: createVenue, isPending } = useCreateVenue();
 
-    const handleSubmit = async (data: any) => {
-        createVenue(data, {
-            onSuccess: () => {
-                toast.success(`${data.name} created successfully`);
+    const handleSubmit = (values: any) => {
+        createVenue(values, {
+            onSuccess: (newVenue) => {
                 setIsOpen(false);
-            },
-            onError: (error) => {
-                toast.error(
-                    `Failed to create ${data.name} error: ${error.message}`
-                );
+                router.push(`/admin/venues/${newVenue.id}/edit`);
             },
         });
     };
@@ -37,7 +32,7 @@ export function CreateVenueButton() {
             <DialogTrigger asChild>
                 <Button>Create Venue</Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Create New Venue</DialogTitle>
                 </DialogHeader>
