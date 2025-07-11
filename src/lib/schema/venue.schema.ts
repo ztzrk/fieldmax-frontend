@@ -1,34 +1,41 @@
 import { z } from "zod";
 
 export const venueSchema = z.object({
-    name: z.string().min(1, { message: "Venue name is required." }),
-    address: z.string().min(1, { message: "Address is required." }),
-    renterId: z.string().uuid({ message: "You must select a renter." }),
-    description: z.string().optional(),
-    mainPhotoUrl: z
+    name: z.string().min(1, { message: "Nama venue tidak boleh kosong." }),
+    address: z.string().min(1, { message: "Alamat tidak boleh kosong." }),
+    renterId: z
         .string()
-        .url({ message: "Must be a valid URL." })
-        .optional()
-        .or(z.literal(""))
-        .nullable(),
+        .uuid({ message: "Anda harus memilih seorang renter." }),
+    description: z.string().optional(),
 });
 
 export type VenueFormValues = z.infer<typeof venueSchema>;
 
-export const venueListItemSchema = z.object({
+const venuePhotoSchema = z.object({
+    id: z.string().uuid(),
+    url: z.string().url(),
+    isFeatured: z.boolean(),
+});
+
+export const venueApiResponseSchema = z.object({
     id: z.string().uuid(),
     name: z.string(),
     address: z.string(),
+    description: z.string().nullable(),
+    status: z.enum(["PENDING", "APPROVED", "REJECTED"]),
+    createdAt: z.string().datetime(),
     renter: z.object({
         fullName: z.string(),
         email: z.string().email(),
     }),
-    description: z.string().optional(),
-    mainPhotoUrl: z.string().optional().nullable(),
-    createdAt: z.string(),
-    status: z.enum(["PENDING", "APPROVED", "REJECTED"]),
+    photos: z.array(venuePhotoSchema).optional(),
+    _count: z
+        .object({
+            fields: z.number().int(),
+        })
+        .optional(),
 });
 
-export const venuesListApiResponseSchema = z.array(venueListItemSchema);
+export const venuesListApiResponseSchema = z.array(venueApiResponseSchema);
 
-export type VenueListItem = z.infer<typeof venueListItemSchema>;
+export type VenueApiResponse = z.infer<typeof venueApiResponseSchema>;
