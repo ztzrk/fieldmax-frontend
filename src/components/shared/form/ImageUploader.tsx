@@ -8,52 +8,52 @@ import { toast } from "sonner";
 import Image from "next/image";
 
 interface ImageUploaderProps {
-    onUploadComplete: (url: string) => void;
-    initialImageUrl?: string | null;
+    venueId: string;
+    onUploadComplete: (photos: any) => void;
 }
 
 export function ImageUploader({
+    venueId,
     onUploadComplete,
-    initialImageUrl,
 }: ImageUploaderProps) {
-    const [file, setFile] = useState<File | null>(null);
+    const [files, setFiles] = useState<FileList | null>(null);
     const [isUploading, setIsUploading] = useState(false);
-    const [previewUrl, setPreviewUrl] = useState<string | null>(
-        initialImageUrl || null
-    );
+    const [previewUrls, setPreviewUrls] = useState<string[]>([]);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            const selectedFile = e.target.files[0];
-            setFile(selectedFile);
-            setPreviewUrl(URL.createObjectURL(selectedFile));
+        if (e.target.files) {
+            setFiles(e.target.files);
+            const urls = Array.from(e.target.files).map((file) =>
+                URL.createObjectURL(file)
+            );
+            setPreviewUrls(urls);
         }
     };
 
     const handleUpload = async () => {
-        if (!file) return;
+        if (!files || files.length === 0) return;
         setIsUploading(true);
 
         const formData = new FormData();
-        formData.append("file", file);
+        Array.from(files).forEach((file) => {
+            formData.append("photos", file);
+        });
 
         try {
-            const response = await api.post("/uploads/direct", formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
-            });
-
-            const publicUrl = response.data.data.publicUrl;
-            onUploadComplete(publicUrl);
-            toast.success("Image uploaded successfully!");
-            setPreviewUrl(publicUrl);
-        } catch (error) {
-            toast.error(
-                error instanceof Error
-                    ? error.message
-                    : "Failed to upload image"
+            const response = await api.post(
+                `/uploads/${venueId}/photos`,
+                formData,
+                {
+                    headers: { "Content-Type": "multipart/form-data" },
+                }
             );
+
+            onUploadComplete(response.data.data);
+            toast.success(`${files.length} image(s) uploaded successfully!`);
+            setFiles(null);
+            setPreviewUrls([]);
+        } catch (error) {
+            toast.error("Image upload failed.");
         } finally {
             setIsUploading(false);
         }
@@ -63,25 +63,33 @@ export function ImageUploader({
         <div className="space-y-4">
             <Input
                 type="file"
+                multiple
                 onChange={handleFileChange}
                 accept="image/png, image/jpeg, image/webp"
             />
-            {previewUrl && (
-                <div className="rounded-md overflow-hidden w-40 h-40 relative">
-                    <Image
-                        src={previewUrl}
-                        alt="Image preview"
-                        fill
-                        style={{ objectFit: "cover" }}
-                    />
-                </div>
-            )}
+            <div className="flex flex-wrap gap-4">
+                {previewUrls.map((url, index) => (
+                    <div
+                        key={index}
+                        className="rounded-md overflow-hidden w-24 h-24 relative"
+                    >
+                        <Image
+                            src={url}
+                            alt="Image preview"
+                            fill
+                            style={{ objectFit: "cover" }}
+                        />
+                    </div>
+                ))}
+            </div>
             <Button
                 type="button"
                 onClick={handleUpload}
-                disabled={!file || isUploading}
+                disabled={!files || isUploading}
             >
-                {isUploading ? "Uploading..." : "Upload Image"}
+                {isUploading
+                    ? `Uploading ${files?.length} files...`
+                    : "Upload Images"}
             </Button>
         </div>
     );
