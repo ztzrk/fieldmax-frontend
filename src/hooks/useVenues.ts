@@ -86,13 +86,16 @@ export function useApproveVenue() {
         },
     });
 }
-export function useRejectVenue() {
+
+export function useRejectVenue(venueId: string) {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (id: string) => VenueService.reject(id),
+        mutationFn: (data: { rejectionReason: string }) =>
+            VenueService.reject(venueId, data),
         onSuccess: () => {
             toast.success("Venue rejected successfully!");
             queryClient.invalidateQueries({ queryKey: ["venues"] });
+            queryClient.invalidateQueries({ queryKey: ["venue", venueId] });
         },
         onError: (error) => {
             toast.error(error.message || "Failed to reject venue.");
