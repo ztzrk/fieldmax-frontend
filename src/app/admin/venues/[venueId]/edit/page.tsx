@@ -1,12 +1,29 @@
 "use client";
 
-import { useGetVenueById, useUpdateVenue } from "@/hooks/useVenues";
+import {
+    useApproveVenue,
+    useGetVenueById,
+    useUpdateVenue,
+} from "@/hooks/useVenues";
 import { FullScreenLoader } from "@/components/FullScreenLoader";
 import { VenueForm } from "../../components/VenueForm";
 import { ImageUploader } from "@/components/shared/form/ImageUploader";
 import { PhotoGallery } from "./components/PhotoGallery";
 import { useQueryClient } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
+import ConfirmationDialog from "@/components/shared/ConfirmationDialog";
+import { Button } from "@/components/ui/button";
+import { RejectDialog } from "./components/RejectDialog";
+import {
+    AlertDialog,
+    AlertDialogDescription,
+} from "@radix-ui/react-alert-dialog";
+import { AlertCircle } from "lucide-react";
+import {
+    AlertDialogContent,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export default function EditVenuePage() {
     const params = useParams();
@@ -18,7 +35,8 @@ export default function EditVenuePage() {
     const { data: venue, isLoading: isLoadingVenue } = useGetVenueById(
         venueId as string
     );
-    const { mutate: updateVenue, isPending } = useUpdateVenue();
+    const { mutate: updateVenue, isPending: isPending } = useUpdateVenue();
+    const { mutate: approveVenue } = useApproveVenue();
 
     const handleFormSubmit = (values: any) => {
         if (!venueId) return;
@@ -39,12 +57,42 @@ export default function EditVenuePage() {
 
     return (
         <div className="space-y-8">
-            <div>
-                <h1 className="text-2xl font-bold">Edit Venue: {venue.name}</h1>
-                <p className="text-muted-foreground">
-                    Update venue details and photos.
-                </p>
+            <div className="flex justify-between items-center">
+                <div>
+                    <h1 className="text-2xl font-bold">
+                        Edit Venue: {venue.name}
+                    </h1>
+                    <p className="text-muted-foreground">
+                        Update venue details and photos.
+                    </p>
+                </div>
+                {venue.status === "PENDING" && (
+                    <div className="flex gap-2">
+                        <ConfirmationDialog
+                            trigger={<Button size="sm">Approve</Button>}
+                            title="Approve this venue?"
+                            description="This venue will become public and bookable."
+                            onConfirm={() => approveVenue(venueId as string)}
+                        />
+                        <RejectDialog venueId={venueId as string} />
+                    </div>
+                )}
             </div>
+
+            {venue.status === "REJECTED" && (
+                <AlertDialog>
+                    <AlertDialogContent>
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>Venue Rejected</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                Reason:{" "}
+                                {venue.rejectionReason || "No reason provided."}
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                    </AlertDialogContent>
+                </AlertDialog>
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div className="md:col-span-2 space-y-6">
