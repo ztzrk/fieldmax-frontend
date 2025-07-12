@@ -34,15 +34,17 @@ const VenueService = {
         return response.data.data;
     },
     deleteMultiple: async (ids: string[]) => {
-        const response = await api.post("/venues/multiple", { ids });
+        const response = await api.post("/venues/multiple", {
+            ids: ids,
+        });
         return response.data.data;
     },
     approve: async (id: string) => {
         const response = await api.patch(`/venues/${id}/approve`);
         return response.data.data;
     },
-    reject: async (id: string) => {
-        const response = await api.patch(`/venues/${id}/reject`);
+    reject: async (id: string, data: { rejectionReason: string }) => {
+        const response = await api.patch(`/venues/${id}/reject`, data);
         return response.data.data;
     },
     deletePhoto: async (photoId: string) => {
