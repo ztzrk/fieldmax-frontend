@@ -1,5 +1,6 @@
 import { api } from "@/lib/api";
 import { venuesListApiResponseSchema } from "@/lib/schema/venue.schema";
+import { toast } from "sonner";
 
 const VenueService = {
     getAll: async () => {
@@ -10,46 +11,93 @@ const VenueService = {
             );
             return validatedData;
         } catch (error) {
-            console.error(
-                "API Get All Venues Error or Validation Failed:",
-                error
-            );
+            toast.error((error as Error).message || "Failed to fetch venues");
             throw error;
         }
     },
+
     getById: async (id: string) => {
-        const response = await api.get(`/venues/${id}`);
-        return response.data.data;
+        try {
+            const response = await api.get(`/venues/${id}`);
+            return response.data.data;
+        } catch (error) {
+            toast.error((error as Error).message || "Failed to fetch venue");
+            throw error;
+        }
     },
+
     create: async (data: any) => {
-        const response = await api.post("/venues", data);
-        return response.data.data;
+        try {
+            await api.post("/venues", data);
+            toast.success("Venue created successfully");
+        } catch (error) {
+            toast.error((error as Error).message || "Failed to create venue");
+            throw error;
+        }
     },
+
     update: async (id: string, data: any) => {
-        const response = await api.put(`/venues/${id}`, data);
-        return response.data.data;
+        try {
+            await api.put(`/venues/${id}`, data);
+            toast.success("Venue updated successfully");
+        } catch (error) {
+            toast.error((error as Error).message || "Failed to update venue");
+            throw error;
+        }
     },
+
     delete: async (id: string) => {
-        const response = await api.delete(`/venues/${id}`);
-        return response.data.data;
+        try {
+            await api.delete(`/venues/${id}`);
+            toast.success("Venue deleted successfully");
+        } catch (error) {
+            toast.error((error as Error).message || "Failed to delete venue");
+            throw error;
+        }
     },
+
     deleteMultiple: async (ids: string[]) => {
-        const response = await api.post("/venues/multiple", {
-            ids: ids,
-        });
-        return response.data.data;
+        try {
+            await api.post("/venues/multiple", {
+                ids: ids,
+            });
+            toast.success("Venues deleted successfully");
+        } catch (error) {
+            toast.error((error as Error).message || "Failed to delete venues");
+            throw error;
+        }
     },
+
     approve: async (id: string) => {
-        const response = await api.patch(`/venues/${id}/approve`);
-        return response.data.data;
+        try {
+            await api.patch(`/venues/${id}/approve`);
+            toast.success("Venue approved successfully");
+        } catch (error) {
+            toast.error((error as Error).message || "Failed to approve venue");
+            throw error;
+        }
     },
+
     reject: async (id: string, data: { rejectionReason: string }) => {
-        const response = await api.patch(`/venues/${id}/reject`, data);
-        return response.data.data;
+        try {
+            await api.patch(`/venues/${id}/reject`, data);
+            toast.success("Venue rejected successfully");
+        } catch (error) {
+            toast.error((error as Error).message || "Failed to reject venue");
+            throw error;
+        }
     },
+
     deletePhoto: async (photoId: string) => {
-        const response = await api.delete(`/venues/photos/${photoId}`);
-        return response.data;
+        try {
+            await api.delete(`/venues/photos/${photoId}`);
+            toast.success("Venue photo deleted successfully");
+        } catch (error) {
+            toast.error(
+                (error as Error).message || "Failed to delete venue photo"
+            );
+            throw error;
+        }
     },
 };
 
