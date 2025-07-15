@@ -1,9 +1,10 @@
 "use client";
 
 import {
-    useApproveVenue,
     useGetVenueById,
     useUpdateVenue,
+    useApproveVenue,
+    useUploadVenuePhotos,
 } from "@/hooks/useVenues";
 import { FullScreenLoader } from "@/components/FullScreenLoader";
 import { VenueForm } from "../../components/VenueForm";
@@ -15,15 +16,22 @@ import ConfirmationDialog from "@/components/shared/ConfirmationDialog";
 import { Button } from "@/components/ui/button";
 import { RejectDialog } from "./components/RejectDialog";
 import {
-    AlertDialog,
-    AlertDialogDescription,
-} from "@radix-ui/react-alert-dialog";
-import { AlertCircle } from "lucide-react";
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
 import {
-    AlertDialogContent,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
+import { CreateFieldButton } from "./components/CreateFieldButton";
+import { DataTable } from "@/components/shared/DataTable";
+import { columns } from "./components/columns";
 
 export default function EditVenuePage() {
     const params = useParams();
@@ -32,28 +40,42 @@ export default function EditVenuePage() {
         : params.venueId;
 
     const queryClient = useQueryClient();
-    const { data: venue, isLoading: isLoadingVenue } = useGetVenueById(
+
+    const {
+        data: venue,
+        isLoading: isLoadingVenue,
+        isError,
+    } = useGetVenueById(venueId as string);
+    const { mutate: updateVenue, isPending: isUpdating } = useUpdateVenue(
         venueId as string
     );
-    const { mutate: updateVenue, isPending: isPending } = useUpdateVenue();
-    const { mutate: approveVenue } = useApproveVenue();
+    const { mutate: approveVenue } = useApproveVenue(venueId as string);
+    const { mutateAsync: uploadPhotos, isPending: isUploading } =
+        useUploadVenuePhotos(venueId as string);
+
+    if (isLoadingVenue) {
+        return <FullScreenLoader />;
+    }
+
+    if (isError || !venue) {
+        return (
+            <div className="text-center text-red-500 py-10">
+                Error: Venue not found or failed to load.
+            </div>
+        );
+    }
 
     const handleFormSubmit = (values: any) => {
-        if (!venueId) return;
-        updateVenue({ id: venueId, data: values });
+        updateVenue({ data: values });
     };
 
-    const handleUploadComplete = () => {
-        if (!venueId) return;
+    const handleUpload = async (files: File[]) => {
+        await uploadPhotos(files);
         queryClient.invalidateQueries({ queryKey: ["venue", venueId] });
     };
 
-    if (!venueId) {
-        return <p>Venue ID not found.</p>;
-    }
-
-    if (isLoadingVenue) return <FullScreenLoader />;
-    if (!venue) return <p>Venue not found.</p>;
+    const photoCount = venue.photos?.length || 0;
+    const isApprovable = photoCount >= 3;
 
     return (
         <div className="space-y-8">
@@ -68,31 +90,54 @@ export default function EditVenuePage() {
                 </div>
                 {venue.status === "PENDING" && (
                     <div className="flex gap-2">
-                        <ConfirmationDialog
-                            trigger={<Button size="sm">Approve</Button>}
-                            title="Approve this venue?"
-                            description="This venue will become public and bookable."
-                            onConfirm={() => approveVenue(venueId as string)}
-                        />
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <span tabIndex={0}>
+                                        <ConfirmationDialog
+                                            trigger={
+                                                <Button
+                                                    size="sm"
+                                                    disabled={!isApprovable}
+                                                >
+                                                    Approve
+                                                </Button>
+                                            }
+                                            title="Approve this venue?"
+                                            description="This venue will become public and bookable."
+                                            onConfirm={() => approveVenue()}
+                                        />
+                                    </span>
+                                </TooltipTrigger>
+                                {!isApprovable && (
+                                    <TooltipContent>
+                                        <p>
+                                            Requires at least 3 photos to
+                                            approve.
+                                        </p>
+                                    </TooltipContent>
+                                )}
+                            </Tooltip>
+                        </TooltipProvider>
                         <RejectDialog venueId={venueId as string} />
                     </div>
                 )}
+                {venue.status == "REJECTED" && (
+                    <Dialog>
+                        <DialogTrigger>
+                            <Button>Reject Message</Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>Reject Message</DialogTitle>
+                                <DialogDescription>
+                                    {venue.rejectionReason || "No Message"}
+                                </DialogDescription>
+                            </DialogHeader>
+                        </DialogContent>
+                    </Dialog>
+                )}
             </div>
-
-            {venue.status === "REJECTED" && (
-                <AlertDialog>
-                    <AlertDialogContent>
-                        <AlertCircle className="h-4 w-4" />
-                        <AlertDialogHeader>
-                            <AlertDialogTitle>Venue Rejected</AlertDialogTitle>
-                            <AlertDialogDescription>
-                                Reason:{" "}
-                                {venue.rejectionReason || "No reason provided."}
-                            </AlertDialogDescription>
-                        </AlertDialogHeader>
-                    </AlertDialogContent>
-                </AlertDialog>
-            )}
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div className="md:col-span-2 space-y-6">
@@ -103,7 +148,7 @@ export default function EditVenuePage() {
                         <VenueForm
                             initialData={venue}
                             onSubmit={handleFormSubmit}
-                            isPending={isPending}
+                            isPending={isUpdating}
                         />
                     </div>
                     <div>
@@ -112,17 +157,24 @@ export default function EditVenuePage() {
                         </h2>
                         <PhotoGallery
                             photos={venue.photos || []}
-                            venueId={venueId}
+                            venueId={venueId as string}
                         />
                     </div>
+                    <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-lg font-semibold">
+                            Fields in this Venue
+                        </h2>
+                        <CreateFieldButton venueId={venueId as string} />
+                    </div>
+                    <DataTable columns={columns} data={venue.fields || []} />
                 </div>
                 <div>
                     <h2 className="text-lg font-semibold mb-4">
                         Add New Photos
                     </h2>
                     <ImageUploader
-                        venueId={venueId}
-                        onUploadComplete={handleUploadComplete}
+                        isUploading={isUploading}
+                        onUpload={handleUpload}
                     />
                 </div>
             </div>
