@@ -1,43 +1,28 @@
-"use client";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AllFieldsTable } from "./components/FieldsTable";
+import { VenuesTable } from "./components/VenuesTable";
 
-import { columns } from "./components/columns";
-import { DataTable } from "@/components/shared/DataTable";
-import { useDeleteMultipleVenues, useGetAllVenues } from "@/hooks/useVenues";
-import { FullScreenLoader } from "@/components/FullScreenLoader";
-import { CreateVenueButton } from "./components/CreateVenueButton";
-
-export default function AdminVenuesPage() {
-    const { data: venues, isLoading, isError } = useGetAllVenues();
-    const { mutate: deleteMultiple, isPending: isDeleting } =
-        useDeleteMultipleVenues();
-    const handleDeleteVenues = async (selectedIds: string[]) => {
-        if (selectedIds.length === 0) return;
-        try {
-            deleteMultiple(selectedIds);
-        } catch (error) {
-            console.error("Error deleting venues:", error);
-        }
-    };
-
-    if (isLoading) return <FullScreenLoader />;
-    if (isError) return <p className="text-red-500">Error loading data.</p>;
-
+export default function VenuesAndFieldsPage() {
     return (
-        <div>
-            <div className="flex justify-between items-center mb-6">
-                <div>
-                    <h1 className="text-2xl font-bold">Venues</h1>
-                    <p className="text-muted-foreground">
-                        Manage all venues in the system.
-                    </p>
-                </div>
-                <CreateVenueButton />
+        <div className="space-y-6">
+            <div>
+                <h1 className="text-2xl font-bold">Venues & Fields</h1>
+                <p className="text-muted-foreground">
+                    Manage all venues and fields in the system.
+                </p>
             </div>
-            <DataTable
-                columns={columns}
-                data={venues || []}
-                onDeleteSelected={handleDeleteVenues}
-            />
+            <Tabs defaultValue="venues" className="space-y-4">
+                <TabsList>
+                    <TabsTrigger value="venues">Venues</TabsTrigger>
+                    <TabsTrigger value="fields">All Fields</TabsTrigger>
+                </TabsList>
+                <TabsContent value="venues">
+                    <VenuesTable />
+                </TabsContent>
+                <TabsContent value="fields">
+                    <AllFieldsTable />
+                </TabsContent>
+            </Tabs>
         </div>
     );
 }
