@@ -1,6 +1,9 @@
 import { api } from "@/lib/api";
-import { venuesListApiResponseSchema } from "@/lib/schema/venue.schema";
-import { toast } from "sonner";
+import {
+    venueDetailApiResponseSchema,
+    venuesListApiResponseSchema,
+} from "@/lib/schema/venue.schema";
+import { AxiosError } from "axios";
 
 const VenueService = {
     getAll: async () => {
@@ -11,48 +14,43 @@ const VenueService = {
             );
             return validatedData;
         } catch (error) {
-            toast.error((error as Error).message || "Failed to fetch venues");
-            throw error;
+            throw error as AxiosError;
         }
     },
 
     getById: async (id: string) => {
         try {
             const response = await api.get(`/venues/${id}`);
-            return response.data.data;
+            const validatedData = venueDetailApiResponseSchema.parse(
+                response.data.data
+            );
+            return validatedData;
         } catch (error) {
-            toast.error((error as Error).message || "Failed to fetch venue");
-            throw error;
+            throw error as AxiosError;
         }
     },
 
     create: async (data: any) => {
         try {
             await api.post("/venues", data);
-            toast.success("Venue created successfully");
         } catch (error) {
-            toast.error((error as Error).message || "Failed to create venue");
-            throw error;
+            throw error as AxiosError;
         }
     },
 
     update: async (id: string, data: any) => {
         try {
             await api.put(`/venues/${id}`, data);
-            toast.success("Venue updated successfully");
         } catch (error) {
-            toast.error((error as Error).message || "Failed to update venue");
-            throw error;
+            throw error as AxiosError;
         }
     },
 
     delete: async (id: string) => {
         try {
             await api.delete(`/venues/${id}`);
-            toast.success("Venue deleted successfully");
         } catch (error) {
-            toast.error((error as Error).message || "Failed to delete venue");
-            throw error;
+            throw error as AxiosError;
         }
     },
 
@@ -61,42 +59,52 @@ const VenueService = {
             await api.post("/venues/multiple", {
                 ids: ids,
             });
-            toast.success("Venues deleted successfully");
         } catch (error) {
-            toast.error((error as Error).message || "Failed to delete venues");
-            throw error;
+            throw error as AxiosError;
         }
     },
 
     approve: async (id: string) => {
         try {
             await api.patch(`/venues/${id}/approve`);
-            toast.success("Venue approved successfully");
         } catch (error) {
-            toast.error((error as Error).message || "Failed to approve venue");
-            throw error;
+            throw error as AxiosError;
         }
     },
 
     reject: async (id: string, data: { rejectionReason: string }) => {
         try {
             await api.patch(`/venues/${id}/reject`, data);
-            toast.success("Venue rejected successfully");
         } catch (error) {
-            toast.error((error as Error).message || "Failed to reject venue");
-            throw error;
+            throw error as AxiosError;
+        }
+    },
+
+    uploadPhotos: async (venueId: string, photos: File[]) => {
+        const formData = new FormData();
+        photos.forEach((photo) => {
+            formData.append("photos", photo);
+        });
+
+        try {
+            const response = await api.post(
+                `/uploads/venue/${venueId}/photos`,
+                formData,
+                {
+                    headers: { "Content-Type": "multipart/form-data" },
+                }
+            );
+            return response.data.data;
+        } catch (error) {
+            throw error as AxiosError;
         }
     },
 
     deletePhoto: async (photoId: string) => {
         try {
             await api.delete(`/venues/photos/${photoId}`);
-            toast.success("Venue photo deleted successfully");
         } catch (error) {
-            toast.error(
-                (error as Error).message || "Failed to delete venue photo"
-            );
-            throw error;
+            throw error as AxiosError;
         }
     },
 };
