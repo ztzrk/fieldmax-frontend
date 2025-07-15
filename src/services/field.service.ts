@@ -1,56 +1,56 @@
 import { api } from "@/lib/api";
-import { toast } from "sonner";
+import { fieldsListApiResponseSchema } from "@/lib/schema/field.schema";
+import { AxiosError } from "axios";
 
-const fieldService = {
+const FieldService = {
     getAll: async () => {
         try {
-            const response = await api.get("/api/fields");
-            return response.data.data;
+            const response = await api.get("/fields");
+            const validatedData = fieldsListApiResponseSchema.parse(
+                response.data.data
+            );
+            return validatedData;
         } catch (error) {
-            toast.error((error as Error).message || "Failed to fetch fields");
+            throw error as AxiosError;
         }
     },
     getById: async (id: string) => {
         try {
-            const response = await api.get(`/api/fields/${id}`);
+            const response = await api.get(`/fields/${id}`);
             return response.data.data;
         } catch (error) {
-            toast.error((error as Error).message || "Failed to fetch field");
+            throw error as AxiosError;
         }
     },
     create: async (data: any) => {
         try {
-            await api.post("/api/fields", data);
-            toast.success("Field created successfully");
+            await api.post("/fields", { ...data, schedules: [] });
         } catch (error) {
-            toast.error((error as Error).message || "Failed to create field");
+            throw error as AxiosError;
         }
     },
 
     update: async (id: string, data: any) => {
         try {
-            await api.put(`/api/fields/${id}`, data);
-            toast.success("Field updated successfully");
+            await api.put(`/fields/${id}`, data);
         } catch (error) {
-            toast.error((error as Error).message || "Failed to update field");
+            throw error as AxiosError;
         }
     },
     delete: async (id: string) => {
         try {
-            await api.delete(`/api/fields/${id}`);
-            toast.success("Field deleted successfully");
+            await api.delete(`/fields/${id}`);
         } catch (error) {
-            toast.error((error as Error).message || "Failed to delete field");
+            throw error as AxiosError;
         }
     },
     deleteMultiple: async (ids: string[]) => {
         try {
-            await api.post("/api/fields/multiple", { ids });
-            toast.success("Fields deleted successfully");
+            await api.post("/fields/multiple", { ids });
         } catch (error) {
-            toast.error((error as Error).message || "Failed to delete fields");
+            throw error as AxiosError;
         }
     },
 };
 
-export default fieldService;
+export default FieldService;
