@@ -1,6 +1,6 @@
 import { api } from "@/lib/api";
 import { usersApiResponseSchema } from "@/lib/schema/user.schema";
-import { toast } from "sonner";
+import { AxiosError } from "axios";
 
 const UserService = {
     getAllUsers: async () => {
@@ -13,37 +13,30 @@ const UserService = {
 
             return validatedData;
         } catch (error) {
-            toast.error((error as Error).message || "Failed to fetch users");
-            throw error;
+            throw error as AxiosError;
         }
     },
     createUser: async (userData: any) => {
         try {
             await api.post("/users", userData);
-            toast.success("User created successfully");
         } catch (error) {
-            toast.error((error as Error).message || "Failed to create user");
-            throw error;
+            throw error as AxiosError;
         }
     },
 
     updateUser: async (userId: string, userData: any) => {
         try {
             await api.put(`/users/${userId}`, userData);
-            toast.success("User updated successfully");
         } catch (error) {
-            toast.error((error as Error).message || "Failed to update user");
-            throw error;
+            throw error as AxiosError;
         }
     },
 
     deleteUser: async (userId: string) => {
         try {
             await api.delete(`/users/${userId}`);
-            toast.success("User deleted successfully");
         } catch (error) {
-            toast.error((error as Error).message || "Failed to delete user");
-            throw error;
+            throw error as AxiosError;
         }
     },
     deleteMultipleUsers: async (userIds: string[]) => {
@@ -51,10 +44,8 @@ const UserService = {
             await api.post("/users/multiple", {
                 ids: userIds,
             });
-            toast.success("Users deleted successfully");
         } catch (error) {
-            toast.error((error as Error).message || "Failed to delete users");
-            throw error;
+            throw error as AxiosError;
         }
     },
 };
