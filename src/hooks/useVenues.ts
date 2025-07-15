@@ -9,11 +9,11 @@ export function useGetAllVenues() {
     });
 }
 
-export function useGetVenueById(id: string) {
+export function useGetVenueById(venueId: string) {
     return useQuery({
-        queryKey: ["venues", id],
-        queryFn: () => VenueService.getById(id),
-        enabled: !!id,
+        queryKey: ["venue", venueId],
+        queryFn: () => VenueService.getById(venueId),
+        enabled: !!venueId,
     });
 }
 
@@ -21,9 +21,10 @@ export function useCreateVenue() {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: (data: any) => VenueService.create(data),
-        onSuccess: () => {
+        onSuccess: (newVenue) => {
             toast.success("Venue created successfully!");
             queryClient.invalidateQueries({ queryKey: ["venues"] });
+            return newVenue;
         },
         onError: (error) => {
             toast.error(error.message || "Failed to create venue.");
@@ -31,14 +32,14 @@ export function useCreateVenue() {
     });
 }
 
-export function useUpdateVenue() {
+export function useUpdateVenue(venueId: string) {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: ({ id, data }: { id: string; data: any }) =>
-            VenueService.update(id, data),
+        mutationFn: (data: any) => VenueService.update(venueId, data),
         onSuccess: () => {
             toast.success("Venue updated successfully!");
             queryClient.invalidateQueries({ queryKey: ["venues"] });
+            queryClient.invalidateQueries({ queryKey: ["venue", venueId] });
         },
         onError: (error) => {
             toast.error(error.message || "Failed to update venue.");
@@ -64,8 +65,8 @@ export function useDeleteMultipleVenues() {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: (ids: string[]) => VenueService.deleteMultiple(ids),
-        onSuccess: () => {
-            toast.success("Venues deleted successfully.");
+        onSuccess: (data, variables) => {
+            toast.success(`${variables.length} venue(s) deleted successfully.`);
             queryClient.invalidateQueries({ queryKey: ["venues"] });
         },
         onError: (error) => {
@@ -73,13 +74,15 @@ export function useDeleteMultipleVenues() {
         },
     });
 }
-export function useApproveVenue() {
+
+export function useApproveVenue(venueId: string) {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (id: string) => VenueService.approve(id),
+        mutationFn: () => VenueService.approve(venueId),
         onSuccess: () => {
             toast.success("Venue approved successfully!");
             queryClient.invalidateQueries({ queryKey: ["venues"] });
+            queryClient.invalidateQueries({ queryKey: ["venue", venueId] });
         },
         onError: (error) => {
             toast.error(error.message || "Failed to approve venue.");
@@ -99,6 +102,21 @@ export function useRejectVenue(venueId: string) {
         },
         onError: (error) => {
             toast.error(error.message || "Failed to reject venue.");
+        },
+    });
+}
+
+export function useUploadVenuePhotos(venueId: string) {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (photos: File[]) =>
+            VenueService.uploadPhotos(venueId, photos),
+        onSuccess: () => {
+            toast.success("Photos uploaded successfully!");
+            queryClient.invalidateQueries({ queryKey: ["venue", venueId] });
+        },
+        onError: (error) => {
+            toast.error(error.message || "Failed to upload photos.");
         },
     });
 }
