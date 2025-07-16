@@ -14,6 +14,8 @@ import { Badge } from "@/components/ui/badge";
 import { useDeleteField } from "@/hooks/useFields";
 import ConfirmationDialog from "@/components/shared/ConfirmationDialog";
 import { fieldNestedApiResponse } from "@/lib/schema/venue.schema";
+import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
 
 const ActionsCell = ({ field }: { field: fieldNestedApiResponse }) => {
     const { mutate: deleteField } = useDeleteField();
@@ -27,7 +29,9 @@ const ActionsCell = ({ field }: { field: fieldNestedApiResponse }) => {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                <DropdownMenuItem>Edit Field</DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                    <Link href={`/admin/fields/${field.id}`}>Edit Field</Link>
+                </DropdownMenuItem>
                 <ConfirmationDialog
                     trigger={
                         <DropdownMenuItem
