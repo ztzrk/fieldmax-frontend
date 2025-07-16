@@ -15,6 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { FieldApiResponse } from "@/lib/schema/field.schema";
 import { useDeleteField } from "@/hooks/useFields";
 import ConfirmationDialog from "@/components/shared/ConfirmationDialog";
+import Link from "next/link";
 
 const ActionsCell = ({ field }: { field: FieldApiResponse }) => {
     const { mutate: deleteField } = useDeleteField();
@@ -28,7 +29,9 @@ const ActionsCell = ({ field }: { field: FieldApiResponse }) => {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                <DropdownMenuItem>Edit Field</DropdownMenuItem>
+                <DropdownMenuItem>
+                    <Link href={`/admin/fields/${field.id}`}>Edit Field</Link>
+                </DropdownMenuItem>
                 <ConfirmationDialog
                     trigger={
                         <DropdownMenuItem
