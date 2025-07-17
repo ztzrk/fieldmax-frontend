@@ -1,10 +1,11 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { useGetFieldById, useUpdateField } from "@/hooks/useFields";
 import { FullScreenLoader } from "@/components/FullScreenLoader";
 import { Separator } from "@/components/ui/separator";
 import { FieldForm } from "../../venues/[venueId]/edit/components/FieldForm";
+import { PageHeader } from "../../components/PageHeader";
 
 export default function EditFieldPage() {
     const params = useParams();
@@ -12,6 +13,12 @@ export default function EditFieldPage() {
         ? params.fieldId[0]
         : params.fieldId;
 
+    const searchParams = useSearchParams();
+    const fromVenueId = searchParams.get("fromVenue");
+
+    const backHref = fromVenueId
+        ? `/admin/venues/${fromVenueId}/edit`
+        : "/admin/venues";
     const {
         data: field,
         isLoading,
@@ -31,12 +38,10 @@ export default function EditFieldPage() {
 
     return (
         <div className="space-y-8">
-            <div>
-                <h1 className="text-2xl font-bold">Edit Field: {field.name}</h1>
-                <p className="text-muted-foreground">
-                    Update field details, schedules, and photos.
-                </p>
-            </div>
+            <PageHeader
+                backHref={backHref}
+                title={`Edit Field: ${field.name}`}
+            />
 
             <Separator />
 
