@@ -29,7 +29,7 @@ const ActionsCell = ({ field }: { field: FieldApiResponse }) => {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                <DropdownMenuItem>
+                <DropdownMenuItem asChild>
                     <Link href={`/admin/fields/${field.id}`}>Edit Field</Link>
                 </DropdownMenuItem>
                 <ConfirmationDialog
