@@ -17,7 +17,13 @@ import { fieldNestedApiResponse } from "@/lib/schema/venue.schema";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 
-const ActionsCell = ({ field }: { field: fieldNestedApiResponse }) => {
+const ActionsCell = ({
+    field,
+    venueId,
+}: {
+    field: fieldNestedApiResponse;
+    venueId: string;
+}) => {
     const { mutate: deleteField } = useDeleteField();
 
     return (
@@ -30,7 +36,11 @@ const ActionsCell = ({ field }: { field: fieldNestedApiResponse }) => {
             <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
                 <DropdownMenuItem asChild>
-                    <Link href={`/admin/fields/${field.id}`}>Edit Field</Link>
+                    <Link
+                        href={`/admin/fields/${field.id}?fromVenue=${venueId}`}
+                    >
+                        Edit Details
+                    </Link>
                 </DropdownMenuItem>
                 <ConfirmationDialog
                     trigger={
@@ -50,7 +60,9 @@ const ActionsCell = ({ field }: { field: fieldNestedApiResponse }) => {
     );
 };
 
-export const columns: ColumnDef<fieldNestedApiResponse>[] = [
+export const getFieldColumns = (
+    venueId: string
+): ColumnDef<fieldNestedApiResponse>[] => [
     {
         accessorKey: "name",
         header: "Field Name",
@@ -89,6 +101,8 @@ export const columns: ColumnDef<fieldNestedApiResponse>[] = [
     },
     {
         id: "actions",
-        cell: ({ row }) => <ActionsCell field={row.original} />,
+        cell: ({ row }) => (
+            <ActionsCell field={row.original} venueId={venueId} />
+        ),
     },
 ];
