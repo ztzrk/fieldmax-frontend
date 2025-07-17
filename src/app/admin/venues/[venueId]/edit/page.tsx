@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/card";
 import { VenueActions } from "./components/VenueActions";
 import { PageHeader } from "@/app/admin/components/PageHeader";
-import { columns } from "./components/columns";
+import { getFieldColumns } from "./components/columns";
 
 export default function EditVenuePage() {
     const params = useParams();
@@ -56,6 +56,8 @@ export default function EditVenuePage() {
                 Error: Venue not found.
             </p>
         );
+
+    const columns = getFieldColumns(venueId!);
 
     return (
         <div className="space-y-8">
