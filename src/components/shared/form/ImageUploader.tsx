@@ -5,6 +5,8 @@ import { useDropzone } from "react-dropzone";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { UploadCloud, X } from "lucide-react";
+import { toast } from "sonner";
+import { ca } from "zod/v4/locales";
 
 interface ImageUploaderProps {
     onUpload: (files: File[]) => Promise<void>;
@@ -59,7 +61,9 @@ export function ImageUploader({ onUpload, isUploading }: ImageUploaderProps) {
             try {
                 await onUpload(files);
             } catch (error) {
-                // Error sudah ditangani oleh hook di parent
+                toast.error(`Upload failed ${error}`, {
+                    description: "Please try again later.",
+                });
             } finally {
                 setFiles([]);
                 setPreviewUrls([]);
