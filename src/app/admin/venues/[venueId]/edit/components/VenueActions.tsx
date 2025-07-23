@@ -1,6 +1,6 @@
 "use client";
 
-import { useApproveVenue, useRejectVenue } from "@/hooks/useVenues";
+import { useApproveVenue } from "@/hooks/useVenues";
 import { Button } from "@/components/ui/button";
 import ConfirmationDialog from "@/components/shared/ConfirmationDialog";
 import { RejectDialog } from "./RejectDialog";
@@ -20,7 +20,20 @@ import {
 } from "@/components/ui/dialog";
 import { AlertCircle } from "lucide-react";
 
-export function VenueActions({ venue }: { venue: any }) {
+export function VenueActions({
+    venue,
+}: {
+    venue: {
+        id: string;
+        status: string;
+        photos: {
+            id: string;
+            url: string;
+            isFeatured: boolean;
+        }[];
+        rejectionReason?: string | null;
+    };
+}) {
     const { mutate: approveVenue } = useApproveVenue(venue.id);
 
     const photoCount = venue.photos?.length || 0;
