@@ -52,7 +52,7 @@ export function DataTable<TData, TValue>({
     const handleDelete = async () => {
         const selectedIds = table
             .getFilteredSelectedRowModel()
-            .rows.map((row) => (row.original as any).id);
+            .rows.map((row) => (row.original as { id: string }).id);
 
         if (onDeleteSelected) {
             await onDeleteSelected(selectedIds);
