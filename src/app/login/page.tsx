@@ -39,22 +39,15 @@ export default function LoginPage() {
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
         setIsSubmitting(true);
-        try {
-            const loggedInUser = await login(values);
-            if (loggedInUser.role === "ADMIN") {
-                router.replace("/admin/dashboard");
-            }
-
-            toast.success("Login berhasil!", {
-                description: `Selamat datang kembali, ${loggedInUser.fullName}.`,
-            });
-        } catch (error) {
-            toast.error("Login Gagal", {
-                description: "Silakan periksa kembali email dan password Anda.",
-            });
-        } finally {
-            setIsSubmitting(false);
+        const loggedInUser = await login(values);
+        if (loggedInUser.role === "ADMIN") {
+            router.replace("/admin/dashboard");
         }
+
+        toast.success("Login berhasil!", {
+            description: `Selamat datang kembali, ${loggedInUser.fullName}.`,
+        });
+        setIsSubmitting(false);
     }
 
     return (
