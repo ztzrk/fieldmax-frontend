@@ -11,6 +11,7 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { FieldForm } from "./FieldForm";
+import { FieldFormValues } from "@/lib/schema/field.schema";
 
 interface CreateFieldButtonProps {
     venueId: string;
@@ -20,7 +21,7 @@ export function CreateFieldButton({ venueId }: CreateFieldButtonProps) {
     const [isOpen, setIsOpen] = useState(false);
     const { mutate: createField, isPending } = useCreateField();
 
-    const handleSubmit = (values: any) => {
+    const handleSubmit = (values: FieldFormValues) => {
         createField(
             { ...values, venueId },
             {
