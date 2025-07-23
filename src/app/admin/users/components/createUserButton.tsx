@@ -12,21 +12,22 @@ import {
 import { toast } from "sonner";
 import { useCreateUser } from "@/hooks/useUsers";
 import { UserForm } from "./userForm";
+import { UserFormValues } from "@/lib/schema/user.schema";
 
 export function CreateUserButton() {
     const [isOpen, setIsOpen] = useState(false);
 
     const { mutate: createUser, isPending } = useCreateUser();
 
-    const handleSubmit = async (data: any) => {
+    const handleSubmit = async (data: UserFormValues) => {
         createUser(data, {
             onSuccess: () => {
-                toast.success(`${data.name} created successfully`);
+                toast.success(`${data.fullName} created successfully`);
                 setIsOpen(false);
             },
             onError: (error) => {
                 toast.error(
-                    `Failed to create ${data.name} error: ${error.message}`
+                    `Failed to create ${data.fullName} error: ${error.message}`
                 );
             },
         });
