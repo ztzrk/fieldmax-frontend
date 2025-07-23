@@ -12,19 +12,23 @@ import {
 } from "@/components/ui/dialog";
 import { VenueForm } from "./VenueForm";
 import { useCreateVenue } from "@/hooks/useVenues";
+import { VenueFormValues } from "@/lib/schema/venue.schema";
 
 export function CreateVenueButton() {
     const [isOpen, setIsOpen] = useState(false);
     const router = useRouter();
-    const { mutate: createVenue, isPending } = useCreateVenue();
+    const { mutateAsync: createVenue, isPending } = useCreateVenue();
 
-    const handleSubmit = (values: any) => {
-        createVenue(values, {
-            onSuccess: (newVenue) => {
+    const handleSubmit = async (values: VenueFormValues) => {
+        try {
+            const newVenue = await createVenue(values);
+            if (newVenue) {
                 setIsOpen(false);
                 router.push(`/admin/venues/${newVenue.id}/edit`);
-            },
-        });
+            }
+        } catch (error) {
+            console.error("Creation failed:", error);
+        }
     };
 
     return (
