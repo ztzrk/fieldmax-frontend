@@ -15,7 +15,6 @@ import { useDeleteField } from "@/hooks/useFields";
 import ConfirmationDialog from "@/components/shared/ConfirmationDialog";
 import { fieldNestedApiResponse } from "@/lib/schema/venue.schema";
 import Link from "next/link";
-import { useAuth } from "@/context/AuthContext";
 
 const ActionsCell = ({
     field,
