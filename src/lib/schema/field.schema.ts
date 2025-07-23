@@ -13,6 +13,15 @@ export const fieldApiResponseSchema = z.object({
     }),
 });
 
+export const fieldFormSchema = z.object({
+    name: z.string().min(1, "Field name is required."),
+    pricePerHour: z.coerce.number().min(0, "Price must be a positive number."),
+    sportTypeId: z.string().uuid("You must select a sport type."),
+    description: z.string().optional(),
+});
+
+export type FieldFormValues = z.infer<typeof fieldFormSchema>;
+
 export const fieldsListApiResponseSchema = z.array(fieldApiResponseSchema);
 
 export type FieldApiResponse = z.infer<typeof fieldApiResponseSchema>;
