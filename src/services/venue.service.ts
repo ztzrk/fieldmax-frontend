@@ -1,6 +1,8 @@
 import { api } from "@/lib/api";
 import {
+    venueApiResponseSchema,
     venueDetailApiResponseSchema,
+    VenueFormValues,
     venuesListApiResponseSchema,
 } from "@/lib/schema/venue.schema";
 import { AxiosError } from "axios";
@@ -30,9 +32,13 @@ const VenueService = {
         }
     },
 
-    create: async (data: any) => {
+    create: async (data: VenueFormValues) => {
         try {
-            await api.post("/venues", data);
+            const response = await api.post("/venues", data);
+            const validatedData = venueApiResponseSchema.parse(
+                response.data.data
+            );
+            return validatedData;
         } catch (error) {
             throw error as AxiosError;
         }
