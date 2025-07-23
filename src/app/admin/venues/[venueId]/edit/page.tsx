@@ -10,7 +10,6 @@ import { VenueForm } from "../../components/VenueForm";
 import { ImageUploader } from "@/components/shared/form/ImageUploader";
 import { PhotoGallery } from "./components/PhotoGallery";
 import { useParams } from "next/navigation";
-import { DataTable } from "@/components/shared/DataTable";
 import { CreateFieldButton } from "./components/CreateFieldButton";
 import {
     Card,
@@ -21,6 +20,8 @@ import {
 } from "@/components/ui/card";
 import { VenueActions } from "./components/VenueActions";
 import { PageHeader } from "@/app/admin/components/PageHeader";
+import { VenueFormValues } from "@/lib/schema/venue.schema";
+import { DataTable } from "@/components/shared/DataTable";
 import { getFieldColumns } from "./components/columns";
 
 export default function EditVenuePage() {
@@ -33,21 +34,12 @@ export default function EditVenuePage() {
         data: venue,
         isLoading,
         isError,
-        refetch,
     } = useGetVenueById(venueId as string);
     const { mutate: updateVenue, isPending: isUpdating } = useUpdateVenue(
         venueId as string
     );
     const { mutateAsync: uploadPhotos, isPending: isUploading } =
         useUploadVenuePhotos(venueId as string);
-
-    const handleFormSubmit = (values: any) => {
-        updateVenue({ data: values });
-    };
-
-    const handleUploadComplete = async () => {
-        await refetch();
-    };
 
     if (isLoading) return <FullScreenLoader />;
     if (isError || !venue)
@@ -57,7 +49,13 @@ export default function EditVenuePage() {
             </p>
         );
 
-    const columns = getFieldColumns(venueId!);
+    const handleFormSubmit = (values: VenueFormValues) => {
+        updateVenue({ data: values });
+    };
+
+    const handleUpload = async (files: File[]) => {
+        await uploadPhotos(Array.from(files));
+    };
 
     return (
         <div className="space-y-8">
@@ -90,7 +88,7 @@ export default function EditVenuePage() {
                         <CardContent>
                             <PhotoGallery
                                 photos={venue.photos || []}
-                                venueId={venueId!}
+                                venueId={venueId}
                             />
                         </CardContent>
                     </Card>
@@ -102,7 +100,7 @@ export default function EditVenuePage() {
                         </CardHeader>
                         <CardContent>
                             <ImageUploader
-                                onUpload={handleUploadComplete}
+                                onUpload={handleUpload}
                                 isUploading={isUploading}
                             />
                         </CardContent>
@@ -119,11 +117,14 @@ export default function EditVenuePage() {
                                 Manage all fields for {venue.name}
                             </CardDescription>
                         </div>
-                        <CreateFieldButton venueId={venueId!} />
+                        <CreateFieldButton venueId={venueId} />
                     </div>
                 </CardHeader>
                 <CardContent>
-                    <DataTable columns={columns} data={venue.fields || []} />
+                    <DataTable
+                        columns={getFieldColumns(venueId)}
+                        data={venue.fields || []}
+                    />
                 </CardContent>
             </Card>
         </div>
