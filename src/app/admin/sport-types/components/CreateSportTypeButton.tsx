@@ -10,13 +10,14 @@ import { useCreateSportType } from "@/hooks/useSportTypes";
 import React from "react";
 import { toast } from "sonner";
 import { SportTypeForm } from "./SportTypeForm";
+import { SportTypeFormValues } from "@/lib/schema/sport-types.schema";
 
 function CreateSportTypeButton() {
     const [isOpen, setIsOpen] = React.useState(false);
 
     const { mutate: createSportType, isPending } = useCreateSportType();
 
-    const handleSubmit = async (data: any) => {
+    const handleSubmit = async (data: SportTypeFormValues) => {
         createSportType(data, {
             onSuccess: () => {
                 toast.success(`${data.name} created successfully`);
