@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import VenueService from "@/services/venue.service";
 import { toast } from "sonner";
+import { VenueApiResponse, VenueFormValues } from "@/lib/schema/venue.schema";
 
 export function useGetAllVenues() {
     return useQuery({
@@ -20,8 +21,8 @@ export function useGetVenueById(venueId: string) {
 export function useCreateVenue() {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (data: any) => VenueService.create(data),
-        onSuccess: (newVenue) => {
+        mutationFn: (data: VenueFormValues) => VenueService.create(data),
+        onSuccess: (newVenue: VenueApiResponse) => {
             toast.success("Venue created successfully!");
             queryClient.invalidateQueries({ queryKey: ["venues"] });
             return newVenue;
