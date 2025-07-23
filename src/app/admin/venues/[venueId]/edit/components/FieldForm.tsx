@@ -2,21 +2,13 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { useGetAllSportTypes } from "@/hooks/useSportTypes";
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { InputField } from "@/components/shared/form/InputField";
 import { SelectField } from "@/components/shared/form/SelectField";
-
-const fieldFormSchema = z.object({
-    name: z.string().min(1, "Field name is required."),
-    pricePerHour: z.coerce.number().min(0, "Price must be a positive number."),
-    sportTypeId: z.string().uuid("You must select a sport type."),
-    description: z.string().optional(),
-});
-
-type FieldFormValues = z.infer<typeof fieldFormSchema>;
+import { fieldFormSchema, FieldFormValues } from "@/lib/schema/field.schema";
+import { FullScreenLoader } from "@/components/FullScreenLoader";
 
 interface FieldFormProps {
     initialData?: Partial<FieldFormValues>;
@@ -47,6 +39,10 @@ export function FieldForm({
             description: "",
         },
     });
+
+    if (isLoadingSportTypes) {
+        return <FullScreenLoader />;
+    }
 
     return (
         <Form {...form}>
