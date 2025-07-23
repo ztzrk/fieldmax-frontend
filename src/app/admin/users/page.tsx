@@ -20,7 +20,7 @@ export default function AdminUsersPage() {
         }
     };
 
-    if (isLoading) return <FullScreenLoader />;
+    if (isLoading || isDeleting) return <FullScreenLoader />;
     if (isError) return <p className="text-red-500">Error loading data.</p>;
 
     return (
