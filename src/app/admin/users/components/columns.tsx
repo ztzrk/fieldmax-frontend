@@ -24,6 +24,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import ConfirmationDialog from "@/components/shared/ConfirmationDialog";
 import { toast } from "sonner";
 import { UserForm } from "./userForm";
+import { UserFormValues } from "@/lib/schema/user.schema";
 
 export type User = {
     id: string;
@@ -42,7 +43,7 @@ const ActionsCell = ({ user }: { user: User }) => {
         deleteUser(user.id);
     };
 
-    const handleEditSubmit = async (data: any) => {
+    const handleEditSubmit = async (data: UserFormValues) => {
         updateUser(
             { userId: user.id, userData: data },
             {
