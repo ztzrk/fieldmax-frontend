@@ -6,6 +6,7 @@ import { FullScreenLoader } from "@/components/FullScreenLoader";
 import { Separator } from "@/components/ui/separator";
 import { FieldForm } from "../../venues/[venueId]/edit/components/FieldForm";
 import { PageHeader } from "../../components/PageHeader";
+import { FieldFormValues } from "@/lib/schema/field.schema";
 
 export default function EditFieldPage() {
     const params = useParams();
@@ -28,7 +29,7 @@ export default function EditFieldPage() {
         fieldId as string
     );
 
-    const handleFormSubmit = (values: any) => {
+    const handleFormSubmit = (values: FieldFormValues) => {
         updateField({ id: fieldId as string, data: values });
     };
 
