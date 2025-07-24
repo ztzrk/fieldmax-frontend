@@ -50,7 +50,7 @@ export default function EditVenuePage() {
         );
 
     const handleFormSubmit = (values: VenueFormValues) => {
-        updateVenue({ data: values });
+        updateVenue(values);
     };
 
     const handleUpload = async (files: File[]) => {
@@ -117,7 +117,7 @@ export default function EditVenuePage() {
                                 Manage all fields for {venue.name}
                             </CardDescription>
                         </div>
-                        <CreateFieldButton venueId={venueId} />
+                        <CreateFieldButton />
                     </div>
                 </CardHeader>
                 <CardContent>
