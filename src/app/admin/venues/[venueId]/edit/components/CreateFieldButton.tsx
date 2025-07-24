@@ -13,17 +13,13 @@ import {
 import { FieldForm } from "./FieldForm";
 import { FieldFormValues } from "@/lib/schema/field.schema";
 
-interface CreateFieldButtonProps {
-    venueId: string;
-}
-
-export function CreateFieldButton({ venueId }: CreateFieldButtonProps) {
+export function CreateFieldButton() {
     const [isOpen, setIsOpen] = useState(false);
     const { mutate: createField, isPending } = useCreateField();
 
     const handleSubmit = (values: FieldFormValues) => {
         createField(
-            { ...values, venueId },
+            { ...values },
             {
                 onSuccess: () => {
                     setIsOpen(false);
