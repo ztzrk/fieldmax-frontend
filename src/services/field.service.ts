@@ -1,5 +1,8 @@
 import { api } from "@/lib/api";
-import { fieldsListApiResponseSchema } from "@/lib/schema/field.schema";
+import {
+    FieldFormValues,
+    fieldsListApiResponseSchema,
+} from "@/lib/schema/field.schema";
 import { AxiosError } from "axios";
 
 const FieldService = {
@@ -22,7 +25,7 @@ const FieldService = {
             throw error as AxiosError;
         }
     },
-    create: async (data: any) => {
+    create: async (data: FieldFormValues) => {
         try {
             await api.post("/fields", { ...data, schedules: [] });
         } catch (error) {
@@ -30,7 +33,7 @@ const FieldService = {
         }
     },
 
-    update: async (id: string, data: any) => {
+    update: async (id: string, data: FieldFormValues) => {
         try {
             await api.put(`/fields/${id}`, data);
         } catch (error) {
