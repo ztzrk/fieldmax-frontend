@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { UploadCloud, X } from "lucide-react";
 import { toast } from "sonner";
-import { ca } from "zod/v4/locales";
 
 interface ImageUploaderProps {
     onUpload: (files: File[]) => Promise<void>;
