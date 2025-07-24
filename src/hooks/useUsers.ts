@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import UserService from "@/services/user.service";
 import { toast } from "sonner";
+import { UserFormValues } from "@/lib/schema/user.schema";
 
 export function useGetAllUsers() {
     return useQuery({
@@ -12,7 +13,8 @@ export function useGetAllUsers() {
 export function useCreateUser() {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (userData: any) => UserService.createUser(userData),
+        mutationFn: (userData: UserFormValues) =>
+            UserService.createUser(userData),
         onSuccess: () => {
             toast.success("User created successfully!");
             queryClient.invalidateQueries({ queryKey: ["users"] });
@@ -26,8 +28,13 @@ export function useCreateUser() {
 export function useUpdateUser() {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: ({ userId, userData }: { userId: string; userData: any }) =>
-            UserService.updateUser(userId, userData),
+        mutationFn: ({
+            userId,
+            userData,
+        }: {
+            userId: string;
+            userData: UserFormValues;
+        }) => UserService.updateUser(userId, userData),
         onSuccess: () => {
             toast.success("User updated successfully!");
             queryClient.invalidateQueries({ queryKey: ["users"] });
