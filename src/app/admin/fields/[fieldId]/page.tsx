@@ -29,8 +29,8 @@ export default function EditFieldPage() {
         fieldId as string
     );
 
-    const handleFormSubmit = (values: FieldFormValues) => {
-        updateField({ id: fieldId as string, data: values });
+    const handleFormSubmit = (data: FieldFormValues) => {
+        updateField(data);
     };
 
     if (isLoading) return <FullScreenLoader />;
