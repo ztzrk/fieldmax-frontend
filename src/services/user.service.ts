@@ -1,5 +1,8 @@
 import { api } from "@/lib/api";
-import { usersApiResponseSchema } from "@/lib/schema/user.schema";
+import {
+    UserFormValues,
+    usersApiResponseSchema,
+} from "@/lib/schema/user.schema";
 import { AxiosError } from "axios";
 
 const UserService = {
@@ -16,7 +19,7 @@ const UserService = {
             throw error as AxiosError;
         }
     },
-    createUser: async (userData: any) => {
+    createUser: async (userData: UserFormValues) => {
         try {
             await api.post("/users", userData);
         } catch (error) {
@@ -24,7 +27,7 @@ const UserService = {
         }
     },
 
-    updateUser: async (userId: string, userData: any) => {
+    updateUser: async (userId: string, userData: UserFormValues) => {
         try {
             await api.put(`/users/${userId}`, userData);
         } catch (error) {
