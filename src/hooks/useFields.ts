@@ -1,3 +1,4 @@
+import { FieldFormValues } from "@/lib/schema/field.schema";
 import FieldService from "@/services/field.service";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -20,7 +21,7 @@ export function useGetFieldById(fieldId: string) {
 export function useCreateField() {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (data: any) => FieldService.create(data),
+        mutationFn: (data: FieldFormValues) => FieldService.create(data),
         onSuccess: () => {
             toast.success("Field created successfully!");
             queryClient.invalidateQueries({ queryKey: ["fields"] });
@@ -34,7 +35,8 @@ export function useCreateField() {
 export function useUpdateField(fieldId: string) {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (data: any) => FieldService.update(fieldId, data),
+        mutationFn: (data: FieldFormValues) =>
+            FieldService.update(fieldId, data),
         onSuccess: () => {
             toast.success("Field updated successfully!");
             queryClient.invalidateQueries({ queryKey: ["fields"] });
