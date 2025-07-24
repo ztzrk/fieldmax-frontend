@@ -2,7 +2,7 @@ import { api } from "@/lib/api";
 import { AxiosError } from "axios";
 
 const AuthService = {
-    login: async (credentials: any) => {
+    login: async (credentials: { email: string; password: string }) => {
         try {
             const response = await api.post("/auth/login", credentials);
             return response.data.data.user;
