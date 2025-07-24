@@ -36,7 +36,8 @@ export function useCreateVenue() {
 export function useUpdateVenue(venueId: string) {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (data: any) => VenueService.update(venueId, data),
+        mutationFn: (data: VenueFormValues) =>
+            VenueService.update(venueId, data),
         onSuccess: () => {
             toast.success("Venue updated successfully!");
             queryClient.invalidateQueries({ queryKey: ["venues"] });
