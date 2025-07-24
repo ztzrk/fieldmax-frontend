@@ -19,7 +19,10 @@ import { GiShuttlecock } from "react-icons/gi";
 import { HelpCircle } from "lucide-react";
 import React from "react";
 
-export const iconMap: Record<string, React.ComponentType<any>> = {
+export const iconMap: Record<
+    string,
+    React.ComponentType<React.SVGProps<SVGSVGElement>>
+> = {
     futbol: FaFutbol,
     tableTennis: FaTableTennisPaddleBall,
     bicycle: FaBicycle,
