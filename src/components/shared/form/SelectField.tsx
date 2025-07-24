@@ -1,6 +1,6 @@
 "use client";
 
-import { Control } from "react-hook-form";
+import { Control, FieldValues, Path } from "react-hook-form";
 import {
     FormControl,
     FormField,
@@ -16,27 +16,21 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 
-interface SelectFieldProps {
-    control: Control<any>;
-    name: string;
+interface SelectFieldProps<T extends FieldValues> {
+    control: Control<T>;
+    name: Path<T>;
     label: string;
     placeholder?: string;
     options: { value: string; label: string }[];
-    disabled?: boolean;
-    required?: boolean;
-    isFullWidth?: boolean;
 }
 
-export function SelectField({
+export function SelectField<T extends FieldValues>({
     control,
     name,
     label,
     placeholder,
     options,
-    disabled,
-    required,
-    isFullWidth = true,
-}: SelectFieldProps) {
+}: SelectFieldProps<T>) {
     return (
         <FormField
             control={control}
@@ -45,16 +39,11 @@ export function SelectField({
                 <FormItem>
                     <FormLabel>{label}</FormLabel>
                     <Select
-                        required={required}
-                        disabled={disabled}
                         onValueChange={field.onChange}
                         defaultValue={field.value}
-                        value={field.value}
                     >
                         <FormControl>
-                            <SelectTrigger
-                                className={`${isFullWidth ? "w-full" : ""}`}
-                            >
+                            <SelectTrigger>
                                 <SelectValue placeholder={placeholder} />
                             </SelectTrigger>
                         </FormControl>
