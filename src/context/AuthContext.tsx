@@ -11,6 +11,7 @@ import {
 import { useRouter } from "next/navigation";
 import AuthService from "@/services/auth.service";
 import { FullScreenLoader } from "@/components/FullScreenLoader";
+import { toast } from "sonner";
 
 interface User {
     id: string;
@@ -23,7 +24,7 @@ interface User {
 
 interface AuthContextType {
     user: User | null;
-    login: (credentials: any) => Promise<User>;
+    login: (credentials: { email: string; password: string }) => Promise<User>;
     logout: () => void;
     isLoading: boolean;
 }
@@ -38,8 +39,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const logout = useCallback(async () => {
         try {
             await AuthService.logout();
-        } catch (error) {
-            console.error("Logout failed on server:", error);
+        } catch {
+            toast.error("Logout gagal. Silakan coba lagi.");
         } finally {
             setUser(null);
             router.push("/login");
@@ -51,23 +52,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             try {
                 const userData = await AuthService.getMe();
                 setUser(userData);
-            } catch (error) {
+            } catch {
                 setUser(null);
             }
             setIsLoading(false);
         };
 
         initializeAuth();
-    }, []);
+    }, [logout]);
 
-    const login = async (credentials: any) => {
-        try {
-            const loggedInUser = await AuthService.login(credentials);
-            setUser(loggedInUser);
-            return loggedInUser;
-        } catch (error) {
-            throw error;
-        }
+    const login = async (credentials: { email: string; password: string }) => {
+        const loggedInUser = await AuthService.login(credentials);
+        setUser(loggedInUser);
+        return loggedInUser;
     };
 
     const value = { user, login, logout, isLoading };
