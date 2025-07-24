@@ -1,18 +1,17 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import AuthService from "@/services/auth.service";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import { UserApiResponse } from "@/lib/schema/user.schema";
 
 export function useLogin() {
-    const queryClient = useQueryClient();
     const router = useRouter();
     const { login: setAuthUser } = useAuth();
 
     return useMutation({
-        mutationFn: (credentials: any) => AuthService.login(credentials),
-        onSuccess: (user: UserApiResponse) => {
+        mutationFn: (credentials: { email: string; password: string }) =>
+            AuthService.login(credentials),
+        onSuccess: (user) => {
             setAuthUser(user);
 
             toast.success("Login berhasil!", {
@@ -28,7 +27,7 @@ export function useLogin() {
 
             router.push(targetDashboard);
         },
-        onError: (error) => {
+        onError: () => {
             toast.error("Login Gagal", {
                 description: "Silakan periksa kembali email dan password Anda.",
             });
