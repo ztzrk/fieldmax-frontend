@@ -44,7 +44,7 @@ const VenueService = {
         }
     },
 
-    update: async (id: string, data: any) => {
+    update: async (id: string, data: VenueFormValues) => {
         try {
             await api.put(`/venues/${id}`, data);
         } catch (error) {
