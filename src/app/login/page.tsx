@@ -42,6 +42,8 @@ export default function LoginPage() {
         const loggedInUser = await login(values);
         if (loggedInUser.role === "ADMIN") {
             router.replace("/admin/dashboard");
+        } else if (loggedInUser.role === "RENTER") {
+            router.replace("/renter/dashboard");
         }
 
         toast.success("Login berhasil!", {
