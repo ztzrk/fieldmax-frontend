@@ -18,34 +18,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "@/components/ui/sidebar";
-
-const items = [
-    {
-        title: "Dashboard",
-        url: "/admin/dashboard",
-        icon: LayoutDashboard,
-    },
-    {
-        title: "Users",
-        url: "/admin/users",
-        icon: Users,
-    },
-    {
-        title: "Sport Types",
-        url: "/admin/sport-types",
-        icon: Swords,
-    },
-    {
-        title: "Venues",
-        url: "/admin/venues",
-        icon: Building,
-    },
-    {
-        title: "Bookings",
-        url: "/admin/bookings",
-        icon: FileText,
-    },
-];
+import { adminNavItems } from "@/config/admin-dashboard";
 
 export function AdminSidebar() {
     const pathname = usePathname();
@@ -57,7 +30,7 @@ export function AdminSidebar() {
                     <SidebarGroupLabel>Application</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
-                            {items.map((item) => {
+                            {adminNavItems.map((item) => {
                                 const isActive = pathname.startsWith(item.url);
                                 return (
                                     <SidebarMenuItem key={item.title}>
