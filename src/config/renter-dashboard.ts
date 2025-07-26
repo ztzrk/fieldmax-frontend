@@ -1,25 +1,25 @@
 import { LayoutDashboard, Building, FileText } from "lucide-react";
 
 export type NavItem = {
-    label: string;
-    href: string;
+    title: string;
+    url: string;
     icon: React.ComponentType<{ className?: string }>;
 };
 
 export const renterNavItems: NavItem[] = [
     {
-        label: "Dashboard",
-        href: "/renter/dashboard",
+        title: "Dashboard",
+        url: "/renter/dashboard",
         icon: LayoutDashboard,
     },
     {
-        label: "My Venues",
-        href: "/renter/venues",
+        title: "My Venues",
+        url: "/renter/venues",
         icon: Building,
     },
     {
-        label: "Bookings",
-        href: "/renter/bookings",
+        title: "Bookings",
+        url: "/renter/bookings",
         icon: FileText,
     },
 ];
