@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { useEffect, ReactNode } from "react";
 import { FullScreenLoader } from "@/components/FullScreenLoader";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import { RenterSidebar } from "./components/sidebar";
+import { Header } from "@/components/shared/header";
 
 export default function RenterLayout({ children }: { children: ReactNode }) {
     const { user, isLoading } = useAuth();
@@ -27,5 +29,14 @@ export default function RenterLayout({ children }: { children: ReactNode }) {
         return <FullScreenLoader />;
     }
 
-    return <SidebarProvider>{children}</SidebarProvider>;
+    return (
+        <SidebarProvider>
+            <RenterSidebar />
+
+            <div className="flex flex-1 flex-col sm:border-l">
+                <Header />
+                <main className="flex-1 p-4 pt-6 md:p-8">{children}</main>
+            </div>
+        </SidebarProvider>
+    );
 }
