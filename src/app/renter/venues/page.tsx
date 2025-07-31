@@ -1,8 +1,14 @@
 "use client";
 
+import { useGetAllVenues } from "@/hooks/useVenues";
 import { CreateVenueWizard } from "./components/CreateVenueWizard";
+import { FullScreenLoader } from "@/components/FullScreenLoader";
 
 export default function RenterVenuesPage() {
+    const { data: venues, isLoading } = useGetAllVenues();
+    if (isLoading) {
+        return <FullScreenLoader />;
+    }
     return (
         <div className="space-y-6">
             <div className="flex justify-between items-center">
