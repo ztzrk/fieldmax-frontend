@@ -13,7 +13,7 @@ import AuthService from "@/services/auth.service";
 import { FullScreenLoader } from "@/components/FullScreenLoader";
 import { toast } from "sonner";
 
-interface User {
+export interface User {
     id: string;
     fullName: string;
     email: string;
@@ -24,7 +24,7 @@ interface User {
 
 interface AuthContextType {
     user: User | null;
-    login: (credentials: { email: string; password: string }) => Promise<User>;
+    login: (user: User) => void; // Perubahan: Sekarang hanya menerima User
     logout: () => void;
     isLoading: boolean;
 }
@@ -61,10 +61,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         initializeAuth();
     }, [logout]);
 
-    const login = async (credentials: { email: string; password: string }) => {
-        const loggedInUser = await AuthService.login(credentials);
-        setUser(loggedInUser);
-        return loggedInUser;
+    const login = (user: User) => {
+        setUser(user);
     };
 
     const value = { user, login, logout, isLoading };
