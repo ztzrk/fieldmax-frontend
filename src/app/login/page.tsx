@@ -1,9 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,8 +14,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useAuth } from "@/context/AuthContext";
-import { toast } from "sonner";
+import { useLogin } from "@/hooks/auth.hooks";
 
 const formSchema = z.object({
     email: z.string().email({ message: "Alamat email tidak valid." }),
@@ -25,31 +22,15 @@ const formSchema = z.object({
 });
 
 export default function LoginPage() {
-    const { login } = useAuth();
-    const router = useRouter();
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const { mutate: login, isPending } = useLogin();
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
-        defaultValues: {
-            email: "",
-            password: "",
-        },
+        defaultValues: { email: "", password: "" },
     });
 
-    async function onSubmit(values: z.infer<typeof formSchema>) {
-        setIsSubmitting(true);
-        const loggedInUser = await login(values);
-        if (loggedInUser.role === "ADMIN") {
-            router.replace("/admin/dashboard");
-        } else if (loggedInUser.role === "RENTER") {
-            router.replace("/renter/dashboard");
-        }
-
-        toast.success("Login berhasil!", {
-            description: `Selamat datang kembali, ${loggedInUser.fullName}.`,
-        });
-        setIsSubmitting(false);
+    function onSubmit(values: z.infer<typeof formSchema>) {
+        login(values);
     }
 
     return (
@@ -100,9 +81,9 @@ export default function LoginPage() {
                             <Button
                                 type="submit"
                                 className="w-full"
-                                disabled={isSubmitting}
+                                disabled={isPending}
                             >
-                                {isSubmitting ? "Memproses..." : "Login"}
+                                {isPending ? "Memproses..." : "Login"}
                             </Button>
                         </form>
                     </Form>
